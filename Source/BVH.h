@@ -61,6 +61,8 @@ struct LinearBVHNode {
 
 class BVH {
     friend class BVHBuilder;
+    friend class RecursiveBVHBuilder;
+    friend class LBVHBuilder;
 public:
 	BVH(std::vector<std::shared_ptr<Primitive>> p);
     ~BVH();

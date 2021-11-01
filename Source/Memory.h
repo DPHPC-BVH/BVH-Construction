@@ -45,39 +45,13 @@ NAMESPACE_DPHPC_BEGIN
 // Memory Declarations
 #define ARENA_ALLOC(arena, Type) new ((arena).Alloc(sizeof(Type))) Type
 
-void* AllocAligned(size_t size) {
-	return _aligned_malloc(size, L1_CACHE_LINE_SIZE);
-	/*
-#if defined(PBRT_HAVE__ALIGNED_MALLOC)
-	return _aligned_malloc(size, PBRT_L1_CACHE_LINE_SIZE);
-#elif defined(PBRT_HAVE_POSIX_MEMALIGN)
-	void* ptr;
-	if (posix_memalign(&ptr, PBRT_L1_CACHE_LINE_SIZE, size) != 0) ptr = nullptr;
-	return ptr;
-#else
-	return memalign(PBRT_L1_CACHE_LINE_SIZE, size);
-#endif
-*/
-}
-
+void* AllocAligned(size_t size);
 template <typename T>
 T* AllocAligned(size_t count) {
 	return (T*)AllocAligned(count * sizeof(T));
 }
 
-void FreeAligned(void* ptr) {
-	
-	if (!ptr) return;
-	_aligned_free(ptr);
-
-	/*
-#if defined(PBRT_HAVE__ALIGNED_MALLOC)
-	_aligned_free(ptr);
-#else
-	free(ptr);
-#endif
-	*/
-}
+void FreeAligned(void*);
 
 class alignas(L1_CACHE_LINE_SIZE)
 MemoryArena {

@@ -1,13 +1,8 @@
 #include "BVHBuilder.h"
+#include <algorithm>
 
-BVHBuilder::BVHBuilder(BVH& bvh) :
-	bvh(bvh),
-	primitiveInfo(bvh.primitives.size())
-{
-	for (size_t i = 0; i < primitiveInfo.size(); ++i)
-		primitiveInfo[i] = { i, primitives[i]->WorldBound() };
+NAMESPACE_DPHPC_BEGIN
 
-}
 
 struct BVHPrimitiveInfo {
 	BVHPrimitiveInfo() {}
@@ -50,6 +45,15 @@ struct BVHBuildNode {
 };
 
 
+BVHBuilder::BVHBuilder(BVH& bvh) :
+	bvh(bvh),
+	primitiveInfo(bvh.primitives.size()) 
+{
+	for (size_t i = 0; i < primitiveInfo.size(); ++i)
+		primitiveInfo[i] = { i, bvh.primitives[i]->WorldBound() };
+
+}
+
 int BVHBuilder::FlattenBVHTree(BVHBuildNode* node, int* offset) {
 	LinearBVHNode* linearNode = &bvh.nodes[*offset];
 	linearNode->bounds = node->bounds;
@@ -74,8 +78,9 @@ int BVHBuilder::FlattenBVHTree(BVHBuildNode* node, int* offset) {
 	return myOffset;
 }
 
-RecursiveBVHBuilder::RecursiveBVHBuilder(SplitMethod splitMethod /*= SplitMethod::SAH*/)
-	: splitMethod(splitMethod)
+RecursiveBVHBuilder::RecursiveBVHBuilder(BVH& bvh, SplitMethod splitMethod /*= SplitMethod::SAH*/)
+	: BVHBuilder(bvh),
+	splitMethod(splitMethod)
 {
 
 
@@ -85,7 +90,7 @@ void RecursiveBVHBuilder::BuildBVH(BVH& bvh) {
 	MemoryArena arena(1024 * 1024);
 	int totalNodes = 0;
 	std::vector<std::shared_ptr<Primitive>> orderedPrims;
-	orderedPrims.reserve(primitives.size());
+	orderedPrims.reserve(bvh.primitives.size());
 	BVHBuildNode* root = RecursiveBuild(arena, primitiveInfo, 0, bvh.primitives.size(),
 		&totalNodes, orderedPrims);
 	bvh.primitives.swap(orderedPrims);
@@ -118,7 +123,7 @@ BVHBuildNode* RecursiveBVHBuilder::RecursiveBuild(
 		int firstPrimOffset = orderedPrims.size();
 		for (int i = start; i < end; ++i) {
 			int primNum = primitiveInfo[i].primitiveNumber;
-			orderedPrims.push_back(primitives[primNum]);
+			orderedPrims.push_back(bvh.primitives[primNum]);
 		}
 		node->InitLeaf(firstPrimOffset, nPrimitives, bounds);
 		return node;
@@ -137,7 +142,7 @@ BVHBuildNode* RecursiveBVHBuilder::RecursiveBuild(
 			int firstPrimOffset = orderedPrims.size();
 			for (int i = start; i < end; ++i) {
 				int primNum = primitiveInfo[i].primitiveNumber;
-				orderedPrims.push_back(primitives[primNum]);
+				orderedPrims.push_back(bvh.primitives[primNum]);
 			}
 			node->InitLeaf(firstPrimOffset, nPrimitives, bounds);
 			return node;
@@ -254,7 +259,7 @@ BVHBuildNode* RecursiveBVHBuilder::RecursiveBuild(
 						int firstPrimOffset = orderedPrims.size();
 						for (int i = start; i < end; ++i) {
 							int primNum = primitiveInfo[i].primitiveNumber;
-							orderedPrims.push_back(primitives[primNum]);
+							orderedPrims.push_back(bvh.primitives[primNum]);
 						}
 						node->InitLeaf(firstPrimOffset, nPrimitives, bounds);
 						return node;
@@ -273,3 +278,4 @@ BVHBuildNode* RecursiveBVHBuilder::RecursiveBuild(
 	return node;
 }
 
+NAMESPACE_DPHPC_END

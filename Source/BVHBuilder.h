@@ -15,9 +15,9 @@ struct BVHPrimitiveInfo;
 class BVHBuilder {
 public:
 	BVHBuilder(BVH& bvh);
-	virtual void BuildBVH() = 0;
+	virtual void BuildBVH(BVH& bvh) = 0;
 
-private:
+protected:
 	int FlattenBVHTree(BVHBuildNode* node, int* offset);
 	BVH& bvh;
 	std::vector<BVHPrimitiveInfo> primitiveInfo;
@@ -28,7 +28,7 @@ class RecursiveBVHBuilder : public BVHBuilder {
 public:
 	enum class SplitMethod { SAH, HLBVH, Middle, EqualCounts };
 
-	RecursiveBVHBuilder(SplitMethod splitMethod = SplitMethod::SAH);
+	RecursiveBVHBuilder(BVH& bvh, SplitMethod splitMethod = SplitMethod::SAH);
 
 	// Inherited via BVHBuilder
 	virtual void BuildBVH(BVH& bvh) override;
@@ -44,7 +44,6 @@ private:
 
 class LBVHBuilder : public BVHBuilder {
 public:
-	LBVHBuilder();
 
 	// Inherited via BVHBuilder
 	virtual void BuildBVH(BVH& bvh) override;

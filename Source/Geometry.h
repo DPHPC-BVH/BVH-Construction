@@ -55,6 +55,25 @@ inline bool isNaN(const int x) {
     return false;
 }
 
+// Forward declarations
+template <typename T>
+class Vector2;
+template <typename T>
+class Vector3;
+template <typename T>
+class Point3;
+template <typename T>
+class Point2;
+template <typename T>
+class Normal3;
+class Ray;
+class RayDifferential;
+template <typename T>
+class Bounds2;
+template <typename T>
+class Bounds3;
+class Transform;
+
 // Vector Declarations
 template <typename T>
 class Vector2 {
