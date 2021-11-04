@@ -4,6 +4,9 @@
     <Filter Include="Source">
       <UniqueIdentifier>{e5608169-db79-463b-ae13-6bbd84d8807b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{d99ec9d0-9aa2-4719-988b-ca28c6dab085}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\BVH.cpp">
@@ -13,6 +16,24 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\Memory.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Test\Main.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Triangle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Parallel.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scene.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Renderer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\tiny_obj_loader.cc">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,10 +62,20 @@
     <ClInclude Include="Source\Utilities.h">
       <Filter>Source</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="Source\kernel.cu">
+    <ClInclude Include="Source\Triangle.h">
       <Filter>Source</Filter>
-    </CudaCompile>
+    </ClInclude>
+    <ClInclude Include="Source\Parallel.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scene.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Renderer.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\tiny_obj_loader.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

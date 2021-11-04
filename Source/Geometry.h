@@ -743,8 +743,8 @@ public:
         return b.pMin != pMin || b.pMax != pMax;
     }
     Point2<T> Lerp(const Point2f& t) const {
-        return Point2<T>(pbrt::Lerp(t.x, pMin.x, pMax.x),
-            pbrt::Lerp(t.y, pMin.y, pMax.y));
+        return Point2<T>(Lerp(t.x, pMin.x, pMax.x),
+            Lerp(t.y, pMin.y, pMax.y));
     }
     Vector2<T> Offset(const Point2<T>& p) const {
         Vector2<T> o = p - pMin;
@@ -815,9 +815,9 @@ public:
             return 2;
     }
     Point3<T> Lerp(const Point3f& t) const {
-        return Point3<T>(pbrt::Lerp(t.x, pMin.x, pMax.x),
-            pbrt::Lerp(t.y, pMin.y, pMax.y),
-            pbrt::Lerp(t.z, pMin.z, pMax.z));
+        return Point3<T>(Lerp(t.x, pMin.x, pMax.x),
+            Lerp(t.y, pMin.y, pMax.y),
+            Lerp(t.z, pMin.z, pMax.z));
     }
     Vector3<T> Offset(const Point3<T>& p) const {
         Vector3<T> o = p - pMin;

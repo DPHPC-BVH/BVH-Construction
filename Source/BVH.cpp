@@ -12,6 +12,10 @@ BVH::BVH(std::vector<std::shared_ptr<Primitive>> p)
 
 }
 
+BVH::BVH():bIsBuilt(false) {
+
+}
+
 BVH::~BVH() {
 	FreeAligned(nodes);
 }

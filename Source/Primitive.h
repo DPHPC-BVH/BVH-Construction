@@ -48,7 +48,7 @@ struct Intersection {
 // todo: this is only a pure virtual base class. Have some implementations like cubes, spheres, triangles.
 class Primitive {
 public:
-	virtual ~Primitive();
+    virtual ~Primitive() {};
 	virtual Bounds3f WorldBound() const = 0;
 	virtual bool Intersect(const Ray& r, Intersection*) const = 0;
 	virtual bool IntersectP(const Ray& r) const = 0;

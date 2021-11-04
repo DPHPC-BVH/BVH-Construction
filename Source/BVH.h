@@ -64,6 +64,7 @@ class BVH {
     friend class RecursiveBVHBuilder;
     friend class LBVHBuilder;
 public:
+    BVH();
 	BVH(std::vector<std::shared_ptr<Primitive>> p);
     ~BVH();
 
