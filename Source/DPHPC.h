@@ -6,6 +6,7 @@
 #include <limits>
 #include <cmath>
 #include <list>
+#include <stdarg.h>
 
 typedef float Float;
 
@@ -149,3 +150,9 @@ inline constexpr bool IsPowerOf2(T v) {
 	return v && !(v & (v - 1));
 }
 
+inline void Error(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+	printf(format, args);
+	va_end(args);
+}

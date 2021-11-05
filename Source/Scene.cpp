@@ -57,7 +57,6 @@ void Scene::LoadMesh(std::string path) {
 	RecursiveBVHBuilder builder(bvh);  // todo: Select different builder
 	builder.BuildBVH();
 
-	int a = 1;
 }
 
 

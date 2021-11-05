@@ -8,6 +8,7 @@
 
 NAMESPACE_DPHPC_BEGIN
 class Scene {
+	friend class Renderer;
 public:
 	void LoadMesh(std::string path);
 	Scene();

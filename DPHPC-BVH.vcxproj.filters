@@ -36,6 +36,9 @@
     <ClCompile Include="Source\tiny_obj_loader.cc">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Transform.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BVH.h">
@@ -75,6 +78,12 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\tiny_obj_loader.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Transform.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Sampling.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

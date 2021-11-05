@@ -16,9 +16,9 @@ Bounds3f Triangle::WorldBound() const {
 
 bool Triangle::Intersect(const Ray& ray, Intersection* isect) const {
 	// Get triangle vertices in _p0_, _p1_, and _p2_
-	const Point3f& p0 = *v[0];
-	const Point3f& p1 = *v[1];
-	const Point3f& p2 = *v[2];
+	const Point3f& p0 = *(v[0]);
+	const Point3f& p1 = *(v[1]);
+	const Point3f& p2 = *(v[2]);
 
 	// Perform ray--triangle intersection test
 

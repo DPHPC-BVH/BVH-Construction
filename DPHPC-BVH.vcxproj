@@ -84,6 +84,7 @@
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\tiny_obj_loader.cc" />
+    <ClCompile Include="Source\Transform.cpp" />
     <ClCompile Include="Source\Triangle.cpp" />
     <ClCompile Include="Test\Main.cpp" />
   </ItemGroup>
@@ -96,9 +97,11 @@
     <ClInclude Include="Source\Parallel.h" />
     <ClInclude Include="Source\Primitive.h" />
     <ClInclude Include="Source\Renderer.h" />
+    <ClInclude Include="Source\Sampling.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\StringPrint.h" />
     <ClInclude Include="Source\tiny_obj_loader.h" />
+    <ClInclude Include="Source\Transform.h" />
     <ClInclude Include="Source\Triangle.h" />
     <ClInclude Include="Source\Utilities.h" />
   </ItemGroup>
