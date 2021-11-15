@@ -98,5 +98,13 @@
     <ClInclude Include="Source\RecursiveBVHBuilder.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\CudaBVHBuilder.cuh">
+      <Filter>Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Source\CudaBVHBuilder.cu">
+      <Filter>Source</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>
