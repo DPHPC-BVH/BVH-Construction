@@ -36,17 +36,7 @@ struct BVHBuildNode {
 	int splitAxis, firstPrimOffset, nPrimitives;
 };
 
-struct BVHPrimitiveInfo {
-	BVHPrimitiveInfo() {}
-	BVHPrimitiveInfo(size_t primitiveNumber, const Bounds3f& bounds)
-		: primitiveNumber(primitiveNumber),
-		bounds(bounds),
-		centroid(.5f * bounds.pMin + .5f * bounds.pMax) {
-	}
-	size_t primitiveNumber;
-	Bounds3f bounds;
-	Point3f centroid;
-};
+
 
 class BVHBuilder {
 public:
@@ -56,7 +46,7 @@ public:
 protected:
 	int FlattenBVHTree(BVHBuildNode* node, int* offset);
 	BVH& bvh;
-	std::vector<BVHPrimitiveInfo> primitiveInfo;
+
 };
 
 

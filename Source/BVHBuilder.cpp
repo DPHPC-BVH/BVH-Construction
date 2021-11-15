@@ -4,12 +4,8 @@ NAMESPACE_DPHPC_BEGIN
 
 
 BVHBuilder::BVHBuilder(BVH& bvh) :
-	bvh(bvh),
-	primitiveInfo(bvh.primitives.size()) 
+	bvh(bvh)
 {
-	for (size_t i = 0; i < primitiveInfo.size(); ++i)
-		primitiveInfo[i] = { i, bvh.primitives[i]->WorldBound() };
-
 }
 
 int BVHBuilder::FlattenBVHTree(BVHBuildNode* node, int* offset) {

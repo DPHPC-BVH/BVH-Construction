@@ -5,10 +5,11 @@ NAMESPACE_DPHPC_BEGIN
 
 RecursiveBVHBuilder::RecursiveBVHBuilder(BVH& bvh, SplitMethod splitMethod /*= SplitMethod::SAH*/)
 	: BVHBuilder(bvh),
+	primitiveInfo(bvh.primitives.size()),
 	splitMethod(splitMethod)
 {
-
-
+	for (size_t i = 0; i < primitiveInfo.size(); ++i)
+		primitiveInfo[i] = { i, bvh.primitives[i]->WorldBound() };
 }
 
 void RecursiveBVHBuilder::BuildBVH() {
