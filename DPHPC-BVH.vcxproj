@@ -79,8 +79,10 @@
   <ItemGroup>
     <ClCompile Include="Source\BVH.cpp" />
     <ClCompile Include="Source\BVHBuilder.cpp" />
+    <ClCompile Include="Source\CudaBVHBuilder.cpp" />
     <ClCompile Include="Source\Memory.cpp" />
     <ClCompile Include="Source\Parallel.cpp" />
+    <ClCompile Include="Source\RecursiveBVHBuilder.cpp" />
     <ClCompile Include="Source\Renderer.cpp" />
     <ClCompile Include="Source\Scene.cpp" />
     <ClCompile Include="Source\tiny_obj_loader.cc" />
@@ -91,11 +93,13 @@
   <ItemGroup>
     <ClInclude Include="Source\BVH.h" />
     <ClInclude Include="Source\BVHBuilder.h" />
+    <ClInclude Include="Source\CudaBVHBuilder.h" />
     <ClInclude Include="Source\DPHPC.h" />
     <ClInclude Include="Source\Geometry.h" />
     <ClInclude Include="Source\Memory.h" />
     <ClInclude Include="Source\Parallel.h" />
     <ClInclude Include="Source\Primitive.h" />
+    <ClInclude Include="Source\RecursiveBVHBuilder.h" />
     <ClInclude Include="Source\Renderer.h" />
     <ClInclude Include="Source\Sampling.h" />
     <ClInclude Include="Source\Scene.h" />

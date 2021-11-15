@@ -39,6 +39,12 @@
     <ClCompile Include="Source\Transform.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\CudaBVHBuilder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RecursiveBVHBuilder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BVH.h">
@@ -84,6 +90,12 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Sampling.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CudaBVHBuilder.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RecursiveBVHBuilder.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

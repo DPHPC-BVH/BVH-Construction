@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "BVHBuilder.h"
+#include "RecursiveBVHBuilder.h"
 
 NAMESPACE_DPHPC_BEGIN
 using namespace tinyobj;
