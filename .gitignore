@@ -402,4 +402,4 @@ CTestTestfile.cmake
 _deps
 
 # OSX related files
-*._.DS_Store
+*.DS_Store
