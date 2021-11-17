@@ -400,3 +400,6 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# OSX related files
+*._.DS_Store
