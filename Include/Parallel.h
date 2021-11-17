@@ -35,7 +35,7 @@
 
  // core/parallel.h*
 #include "DPHPC.h"
-#include "geometry.h"
+#include "Geometry.h"
 #include <mutex>
 #include <condition_variable>
 #include <functional>

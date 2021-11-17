@@ -1,6 +1,6 @@
-#include "../Source/Scene.h"
-#include "../Source/Renderer.h"
-#include "../Source/Parallel.h"
+#include "Scene.h"
+#include "Renderer.h"
+#include "Parallel.h"
 
 using namespace DPHPC;
 
