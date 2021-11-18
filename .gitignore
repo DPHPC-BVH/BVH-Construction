@@ -403,3 +403,6 @@ _deps
 
 # OSX related files
 *.DS_Store
+
+# Project related excludes
+Scenes/*
