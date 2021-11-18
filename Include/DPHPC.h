@@ -6,6 +6,7 @@
 #include <limits>
 #include <cmath>
 #include <list>
+#include <cstring>
 #include <stdarg.h>
 
 typedef float Float;
