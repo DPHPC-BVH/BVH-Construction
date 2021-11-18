@@ -11,6 +11,11 @@
 
 typedef float Float;
 
+// OS Detection
+#if defined(_WIN32) || defined(_MSC_VER)
+#define OS_WIN
+#endif
+
 // Namespace macros
 #define NAMESPACE_BEGIN(name) namespace name{
 #define NAMESPACE_END };

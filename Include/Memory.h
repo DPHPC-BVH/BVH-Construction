@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include "DPHPC.h"
 
 NAMESPACE_DPHPC_BEGIN
