@@ -3,15 +3,39 @@
 #
 cmake_minimum_required (VERSION 3.13)
 
-project ("dphpc-bvh")
+project ("dphpc-bvh" LANGUAGES CXX CUDA)
 
+# Find CUDA and later include $CUDA_INCLUDE_DIRS
+find_package(CUDA 11.0 REQUIRED)
 
-include_directories(${PROJECT_SOURCE_DIR}/Include)
+###### MAIN BUILD #######
+include_directories(${PROJECT_SOURCE_DIR}/Include ${CUDA_INCLUDE_DIRS})
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS "-O3 -pthread")
+set(CMAKE_C_FLAGS "-O3 -pthread")
+
+set ( SRC 
+        "Src/BVH.cpp"
+        "Src/BVHBuilder.cpp"
+        "Src/CudaBVHBuilder.cpp"
+        "Src/CudaBVHBuilder.cu"
+        "Src/Memory.cpp"
+        "Src/Parallel.cpp"
+        "Src/RecursiveBVHBuilder.cpp"
+        "Src/Renderer.cpp"
+        "Src/Scene.cpp"
+        "Src/tiny_obj_loader.cc"
+        "Src/Transform.cpp"
+        "Src/Triangle.cpp"
+		)
+
+add_executable (main "Src/Main.cpp" ${SRC})
+
+########### TESTING ###############  
 # Install google test
 include(FetchContent)
 FetchContent_Declare(
@@ -33,32 +57,10 @@ if(NOT googletest_POPULATED)
 		)
 endif()
 
-
-set(CMAKE_CXX_FLAGS "-O3 -pthread")
-set(CMAKE_C_FLAGS "-O3 -pthread")
-
-set ( SRC 
-        "Src/BVH.cpp"
-        "Src/BVHBuilder.cpp"
-        #"Src/CudaBVHBuilder.cpp"
-        "Src/Memory.cpp"
-        "Src/Parallel.cpp"
-        "Src/RecursiveBVHBuilder.cpp"
-        "Src/Renderer.cpp"
-        "Src/Scene.cpp"
-        "Src/tiny_obj_loader.cc"
-        "Src/Transform.cpp"
-        "Src/Triangle.cpp"
-		)
-
-add_executable (main "Src/Main.cpp" ${SRC})
-
-# TESTING
 enable_testing()
 
 add_executable(unitTestTest "Test/unitTestTest.cc")
 target_link_libraries( unitTestTest gtest_main )
-
 
 include(GoogleTest)
 gtest_discover_tests(unitTestTest)
