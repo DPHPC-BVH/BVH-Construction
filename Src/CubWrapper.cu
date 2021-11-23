@@ -34,7 +34,7 @@ void DeviceSort(unsigned int numberOfElements, unsigned int* keysIn, unsigned in
     unsigned int* valuesIn, unsigned int* valuesOut)
 {   
 
-    // Allocate Memory 
+    // Allocate memory 
     unsigned int  *dKeysIn;
     unsigned int  *dKeysOut;
     unsigned int  *dValuesIn;
@@ -55,6 +55,12 @@ void DeviceSort(unsigned int numberOfElements, unsigned int* keysIn, unsigned in
     // Copy results from Device to Host
     cudaMemcpy(keysOut, dKeysOut, sizeof(unsigned int) * numberOfElements, cudaMemcpyDeviceToHost);
     cudaMemcpy(valuesOut, dValuesOut, sizeof(unsigned int) * numberOfElements, cudaMemcpyDeviceToHost);
+
+    // Free memory
+    cudaFree(dKeysIn);
+    cudaFree(dKeysOut);
+    cudaFree(dValuesIn);
+    cudaFree(dValuesOut);
 
 }
 
