@@ -1,6 +1,4 @@
 #include "CudaBVHBuilder.h"
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include "CudaBVHBuilder.cuh"
 
 NAMESPACE_DPHPC_BEGIN
@@ -32,7 +30,7 @@ CudaBVHBuilder::~CudaBVHBuilder() {
 
 void CudaBVHBuilder::BuildBVH() {
 	// Launch the kernel to parallelly construct all the interior nodes
-	ParallelConstructInteriorNodes << < /* Identify number of threads here*/ >> > (primitiveInfo.size(), primitiveInfo_device, interiorNodes_device);
+	// ParallelConstructInteriorNodes << < /* Identify number of threads here*/ >> > (primitiveInfo.size(), primitiveInfo_device, interiorNodes_device);
 
 	// Copy back the interior nodes to CPU
 	// Linearize the BVH (see BVHBuilder::FlattenBVHTree) and feed the required data to BVHBuilder::bvh  

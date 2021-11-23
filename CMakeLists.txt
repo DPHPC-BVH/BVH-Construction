@@ -60,7 +60,11 @@ endif()
 enable_testing()
 
 add_executable(unitTestTest "Test/unitTestTest.cc")
+add_executable(cudaBVHBuilderTest "Test/cudaBVHBuilderTest.cc")
+
 target_link_libraries( unitTestTest gtest_main )
+target_link_libraries( cudaBVHBuilderTest gtest_main )
 
 include(GoogleTest)
 gtest_discover_tests(unitTestTest)
+gtest_discover_tests(cudaBVHBuilderTest)

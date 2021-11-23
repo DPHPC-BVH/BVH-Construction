@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BVHBuilder.h"
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 
 NAMESPACE_DPHPC_BEGIN
@@ -40,7 +42,7 @@ private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
 	BVHPrimitiveInfoWithIndex* primitiveInfo_device;
 	BVHBuildNodeDevice* interiorNodes_device;
-
+	uint32_t* mortonCodes;
 
 };
 
