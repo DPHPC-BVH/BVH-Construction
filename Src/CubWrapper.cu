@@ -30,6 +30,11 @@ template <typename T> void DeviceSort(unsigned int numberOfElements, T** dKeysIn
 
 }
 
+void DeviceSort(unsigned int numberOfElements, unsigned int** dKeysIn, unsigned int** dKeysOut,
+                 unsigned int** dValuesIn, unsigned int** dValuesOut) {
+    DeviceSort<unsigned int>(numberOfElements, dKeysIn, dKeysOut, dValuesIn, dValuesOut);
+}
+
 void DeviceSort(unsigned int numberOfElements, unsigned int* keysIn, unsigned int* keysOut,
     unsigned int* valuesIn, unsigned int* valuesOut)
 {   

@@ -6,11 +6,11 @@
 
 NAMESPACE_DPHPC_BEGIN
 
-void GenerateMortonCodes32(int nPrimitives, unsigned int* dMortonCodes,
-        BVHPrimitiveInfoWithIndex* dPrimitiveInfo);
+void GenerateMortonCodes32(int nPrimitives, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+        unsigned int* dMortonCodes, unsigned int* dIndices);
 
-__global__ void GenerateMortonCodes32Kernel(int nPrimitives, unsigned int* mortonCodes,
-        BVHPrimitiveInfoWithIndex* primitiveInfo);
+__global__ void GenerateMortonCodes32Kernel(int nPrimitives, BVHPrimitiveInfoWithIndex* primitiveInfo,
+        unsigned int* dMortonCodes, unsigned int* indices);
 
 
 __forceinline__ __device__ uint32_t LeftShiftAndExpand32(uint32_t x)

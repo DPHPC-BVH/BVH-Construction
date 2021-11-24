@@ -1,5 +1,6 @@
 #include "CudaBVHBuilder.h"
 #include "CudaBVHBuilder.cuh"
+#include "CubWrapper.cuh"
 
 NAMESPACE_DPHPC_BEGIN
 
@@ -30,9 +31,17 @@ void CudaBVHBuilder::BuildBVH() {
 	// 1. Compute Morton Codes
 	unsigned int* dMortonCodes;
 	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
-	
+	unsigned int* dMortonIndices;
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	GenerateMortonCodes32(primitiveInfo.size(), dPrimitiveInfo, dMortonCodes, dMortonIndices);
 	
 	// 2. Sort Morton Codes
+	unsigned int* dMortonCodesSorted;
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	unsigned int* dMortonIndicesSorted;
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	DeviceSort(primitiveInfo.size(), &dMortonCodes, &dMortonCodesSorted,
+                 &dMortonIndices, &dMortonIndicesSorted);
 
 	
 	// 3. Build tree hierarchy of CudaBVHBuildNodes
