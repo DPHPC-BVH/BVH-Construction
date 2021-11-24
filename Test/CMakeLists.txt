@@ -1,7 +1,7 @@
 set(test_src
-  runAll.cc
-  unitTestTest.cc
-  cubWrapperTest.cc
+  RunAll.cc
+  UnitTestTest.cc
+  CubWrapperTest.cc
 )
 
 add_executable(test_dphp_bvh ${test_src})
