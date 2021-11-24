@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <vector>
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 #include "CubWrapper.cuh"
 
@@ -14,7 +15,35 @@ TEST(CubWrapperTest, DeviceSort) {
   unsigned int keysOut[7];
   unsigned int valuesOut[7];
 
-  DeviceSort(numItems, keysIn, keysOut, valuesIn, valuesOut);
+  
+   // Allocate memory 
+  unsigned int  *dKeysIn;
+  unsigned int  *dKeysOut;
+  unsigned int  *dValuesIn;
+  unsigned int  *dValuesOut;
+
+  cudaMalloc(&dKeysIn, numItems * sizeof(unsigned int));
+  cudaMalloc(&dKeysOut, numItems * sizeof(unsigned int));
+  cudaMalloc(&dValuesIn, numItems * sizeof(unsigned int));
+  cudaMalloc(&dValuesOut, numItems * sizeof(unsigned int));
+
+  // Copy input to Device
+  cudaMemcpy(dKeysIn, keysIn, sizeof(unsigned int) * numItems, cudaMemcpyHostToDevice);
+  cudaMemcpy(dValuesIn, valuesIn, sizeof(unsigned int) * numItems, cudaMemcpyHostToDevice);
+
+  // Perform sort on Device
+  DeviceSort(numItems, &dKeysIn, &dKeysOut, &dValuesIn, &dValuesOut);
+
+  // Copy results from Device to Host
+  cudaMemcpy(keysOut, dKeysOut, sizeof(unsigned int) * numItems, cudaMemcpyDeviceToHost);
+  cudaMemcpy(valuesOut, dValuesOut, sizeof(unsigned int) * numItems, cudaMemcpyDeviceToHost);
+
+  // Free memory
+  cudaFree(dKeysIn);
+  cudaFree(dKeysOut);
+  cudaFree(dValuesIn);
+  cudaFree(dValuesOut);
+
   
   unsigned int keysOutExpected[7] = {0, 3, 5, 6, 7, 8, 9};
   for (size_t i = 0; i < numItems; i++)

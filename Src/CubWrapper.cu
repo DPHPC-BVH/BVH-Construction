@@ -35,38 +35,4 @@ void DeviceSort(unsigned int numberOfElements, unsigned int** dKeysIn, unsigned 
     DeviceSort<unsigned int>(numberOfElements, dKeysIn, dKeysOut, dValuesIn, dValuesOut);
 }
 
-void DeviceSort(unsigned int numberOfElements, unsigned int* keysIn, unsigned int* keysOut,
-    unsigned int* valuesIn, unsigned int* valuesOut)
-{   
-
-    // Allocate memory 
-    unsigned int  *dKeysIn;
-    unsigned int  *dKeysOut;
-    unsigned int  *dValuesIn;
-    unsigned int  *dValuesOut;
-
-    cudaMalloc(&dKeysIn, numberOfElements * sizeof(unsigned int));
-    cudaMalloc(&dKeysOut, numberOfElements * sizeof(unsigned int));
-    cudaMalloc(&dValuesIn, numberOfElements * sizeof(unsigned int));
-    cudaMalloc(&dValuesOut, numberOfElements * sizeof(unsigned int));
-
-    // Copy input to Device
-    cudaMemcpy(dKeysIn, keysIn, sizeof(unsigned int) * numberOfElements, cudaMemcpyHostToDevice);
-    cudaMemcpy(dValuesIn, valuesIn, sizeof(unsigned int) * numberOfElements, cudaMemcpyHostToDevice);
-
-    // Pereform sort on Device
-    DeviceSort<unsigned int>(numberOfElements, &dKeysIn, &dKeysOut, &dValuesIn, &dValuesOut);
-
-    // Copy results from Device to Host
-    cudaMemcpy(keysOut, dKeysOut, sizeof(unsigned int) * numberOfElements, cudaMemcpyDeviceToHost);
-    cudaMemcpy(valuesOut, dValuesOut, sizeof(unsigned int) * numberOfElements, cudaMemcpyDeviceToHost);
-
-    // Free memory
-    cudaFree(dKeysIn);
-    cudaFree(dKeysOut);
-    cudaFree(dValuesIn);
-    cudaFree(dValuesOut);
-
-}
-
 NAMESPACE_DPHPC_END
