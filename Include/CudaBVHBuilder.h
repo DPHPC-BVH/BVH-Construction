@@ -23,11 +23,17 @@ struct BVHPrimitiveInfoWithIndex {
 
 // A GPU version of BVHBuildNode.
 // We are using indices instead of pointers to allow direct copying of the nodes from device to host.
-struct BVHBuildNodeDevice {
-	int idx;  // The index of this node in the array of all nodes.
+struct CudaBVHBuildNode {
+
 	Bounds3f bounds;
-	int children[2];  // The indices of its two children. 
-	// And more info...
+	// The indies specifing the location of the children in an array of CudaBVHBuildNode's.
+	// -1 represents no child
+	int children[2];
+
+	// The indies specifing the location of the parent in an array of CudaBVHBuildNode's.
+	// -1 repreesnets no parent, especially the root has parent == -1
+	int parent; 
+
 };
 
 class CudaBVHBuilder : public BVHBuilder {
@@ -40,8 +46,6 @@ public:
 
 private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
-	BVHPrimitiveInfoWithIndex* primitiveInfo_device;
-	BVHBuildNodeDevice* interiorNodes_device;
 	uint32_t* mortonCodes;
 
 };

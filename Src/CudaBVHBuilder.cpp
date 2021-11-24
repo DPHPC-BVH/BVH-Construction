@@ -13,27 +13,40 @@ CudaBVHBuilder::CudaBVHBuilder(BVH& bvh)
 	for (int i = 0; i < bvh.primitives.size(); ++i) {
 		primitiveInfo.push_back({ i, bvh.primitives[i]->WorldBound() });
 	}
-
-	// Copying bounding boxes to device
-	cudaMalloc(&primitiveInfo_device, sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size());
-	cudaMemcpy(primitiveInfo_device, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size(), cudaMemcpyHostToDevice);
-	// For n primitives (leaf nodes) there are always n-1 interior nodes
-	cudaMalloc(&interiorNodes_device, sizeof(BVHBuildNodeDevice) * (primitiveInfo.size()-1));
 }
 
 
 CudaBVHBuilder::~CudaBVHBuilder() {
-	cudaFree(primitiveInfo_device);
-	cudaFree(interiorNodes_device);
 }
 
 
 void CudaBVHBuilder::BuildBVH() {
-	// Launch the kernel to parallelly construct all the interior nodes
-	// ParallelConstructInteriorNodes << < /* Identify number of threads here*/ >> > (primitiveInfo.size(), primitiveInfo_device, interiorNodes_device);
 
-	// Copy back the interior nodes to CPU
-	// Linearize the BVH (see BVHBuilder::FlattenBVHTree) and feed the required data to BVHBuilder::bvh  
+	// For BVH construction we only need the bounding boxes and the centroids of the primitive
+	BVHPrimitiveInfoWithIndex* dPrimitiveInfo;
+	cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size());
+	cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size(), cudaMemcpyHostToDevice);
+
+	// 1. Compute Morton Codes
+	unsigned int* dMortonCodes;
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	
+	
+	// 2. Sort Morton Codes
+
+	
+	// 3. Build tree hierarchy of CudaBVHBuildNodes
+
+	
+	// 4. Compute Bounding Boxes of each node
+
+	
+	// 5. Flatten Tree
+
+
+	// 6. Don't forget to free  memory
+	cudaFree(dPrimitiveInfo);
+
 
 }
 

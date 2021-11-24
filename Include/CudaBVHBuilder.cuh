@@ -4,13 +4,14 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-
 NAMESPACE_DPHPC_BEGIN
 
-// Given the primitive info, construct all interior nodes
-__global__ void ParallelConstructInteriorNodes(int nPrimitives, BVHPrimitiveInfoWithIndex* primitiveInfo_device, BVHBuildNodeDevice* interiorNodes_device);
+void GenerateMortonCodes32(int nPrimitives, unsigned int* dMortonCodes,
+        BVHPrimitiveInfoWithIndex* dPrimitiveInfo);
 
-__global__ void GenerateMortonCodes32(int nPrimitives, unsigned int* mortonCodes, BVHPrimitiveInfoWithIndex* primitiveInfo_device);
+__global__ void GenerateMortonCodes32Kernel(int nPrimitives, unsigned int* mortonCodes,
+        BVHPrimitiveInfoWithIndex* primitiveInfo);
+
 
 __forceinline__ __device__ uint32_t LeftShiftAndExpand32(uint32_t x)
 {
@@ -29,7 +30,7 @@ __forceinline__ __device__ uint32_t LeftShiftAndExpand32(uint32_t x)
 /**
  * Function that computes the 32 bit morton code of a 3D-Point where x,y,z in [0,1]
  */
-__forceinline__ __device__ uint32_t getMortonCode32(float x, float y, float z) {
+__forceinline__ __device__ uint32_t GetMortonCode32(float x, float y, float z) {
     return (LeftShiftAndExpand32(1024 * z) << 2) | (LeftShiftAndExpand32(1024 * y) << 1) | LeftShiftAndExpand32(1024 * x);
 }
 
