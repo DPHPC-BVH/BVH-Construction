@@ -24,31 +24,34 @@ CudaBVHBuilder::~CudaBVHBuilder() {
 void CudaBVHBuilder::BuildBVH() {
 
 	// For BVH construction we only need the bounding boxes and the centroids of the primitive
+	const unsigned int nPrimitives = primitiveInfo.size();
+
 	BVHPrimitiveInfoWithIndex* dPrimitiveInfo;
-	cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size());
-	cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * primitiveInfo.size(), cudaMemcpyHostToDevice);
+	cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives);
+	cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives, cudaMemcpyHostToDevice);
 
 	// 1. Compute Morton Codes
 	unsigned int* dMortonCodes;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
 	unsigned int* dMortonIndices;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
-	GenerateMortonCodes32(primitiveInfo.size(), dPrimitiveInfo, dMortonCodes, dMortonIndices);
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+	GenerateMortonCodes32(nPrimitives, dPrimitiveInfo, dMortonCodes, dMortonIndices);
 	
 	// 2. Sort Morton Codes
 	unsigned int* dMortonCodesSorted;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
 	unsigned int* dMortonIndicesSorted;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int*) * primitiveInfo.size());
-	DeviceSort(primitiveInfo.size(), &dMortonCodes, &dMortonCodesSorted,
+	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+	DeviceSort(nPrimitives, &dMortonCodes, &dMortonCodesSorted,
                  &dMortonIndices, &dMortonIndicesSorted);
 
-	
 	// 3. Build tree hierarchy of CudaBVHBuildNodes
+	CudaBVHBuildNode* dTree;
+	cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
+	BuildTreeHierarchy(nPrimitives, dMortonCodesSorted, dMortonIndicesSorted, dTree);
 
-	
 	// 4. Compute Bounding Boxes of each node
-
+	
 	
 	// 5. Flatten Tree
 

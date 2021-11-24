@@ -34,4 +34,26 @@ __forceinline__ __device__ uint32_t GetMortonCode32(float x, float y, float z) {
     return (LeftShiftAndExpand32(1024 * z) << 2) | (LeftShiftAndExpand32(1024 * y) << 1) | LeftShiftAndExpand32(1024 * x);
 }
 
+void BuildTreeHierarchy(int nPrimitives, unsigned int* dMortonCodesSorted,
+        unsigned int* dIndicesSorted, CudaBVHBuildNode* dTree);
+
+__global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCodesSorted,
+        unsigned int* indicesSorted, CudaBVHBuildNode* tree);
+
+__device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int numberOfElements,
+        int index1, int index2, unsigned int key1);
+
+/**
+ * Computes the sign function
+ */
+template <typename T> __forceinline__ __device__ __host__ int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+/**
+ * Computes ceil(x / y) for x >= 0 and y > 0
+ */
+__forceinline__ __device__ __host__ int divCeil(int x, int y) {
+    return x / y + (x % y != 0);
+}
+
 NAMESPACE_DPHPC_END
