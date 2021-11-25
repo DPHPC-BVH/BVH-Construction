@@ -55,14 +55,14 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
     CudaBVHBuildNode(12, 13, 5),
 
     // Leafs
-    CudaBVHBuildNode(-1, -1, 1),
-    CudaBVHBuildNode(-1, -1, 1),
-    CudaBVHBuildNode(-1, -1, 2),
-    CudaBVHBuildNode(-1, -1, 2),
-    CudaBVHBuildNode(-1, -1, 4),
-    CudaBVHBuildNode(-1, -1, 6),
-    CudaBVHBuildNode(-1, -1, 6),
-    CudaBVHBuildNode(-1, -1, 5)
+    CudaBVHBuildNode(-1, -1, 1, indicesSorted[0]),
+    CudaBVHBuildNode(-1, -1, 1, indicesSorted[1]),
+    CudaBVHBuildNode(-1, -1, 2, indicesSorted[2]),
+    CudaBVHBuildNode(-1, -1, 2, indicesSorted[3]),
+    CudaBVHBuildNode(-1, -1, 4, indicesSorted[4]),
+    CudaBVHBuildNode(-1, -1, 6, indicesSorted[5]),
+    CudaBVHBuildNode(-1, -1, 6, indicesSorted[6]),
+    CudaBVHBuildNode(-1, -1, 5, indicesSorted[7])
 
   };
 
@@ -97,7 +97,7 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
     }
     if(i >= nPrimitives - 1) {
       // Leaf node is dataIdx should be in [0, nPrimitives)
-      EXPECT_TRUE(tree[i].dataIdx >= 0 && tree[i].dataIdx < nPrimitives);
+      EXPECT_EQ(tree[i].dataIdx, treeExpected[i].dataIdx);
     }
   }
 
