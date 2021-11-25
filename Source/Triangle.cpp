@@ -124,7 +124,9 @@ bool Triangle::Intersect(const Ray& ray, Intersection* isect) const {
 
 	// Fill in _SurfaceInteraction_ from triangle hit
 	*isect = Intersection{ pHit, Normal3f(Normalize(Cross(p0 - p2, p1 - p2))) };
-
+	
+	// Note: this is originally done in GeometricPrimitive
+	ray.tMax = t;
 	return true;
 }
 
