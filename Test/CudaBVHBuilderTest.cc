@@ -75,12 +75,12 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
   cudaMemcpy(dIndicesSorted, indicesSorted, sizeof(unsigned int) * nPrimitives, cudaMemcpyHostToDevice);
 
   CudaBVHBuildNode* dTree;
-  cudaMalloc(&dTree, nPrimitives * sizeof(CudaBVHBuildNode));
+  cudaMalloc(&dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode));
 
   BuildTreeHierarchy(nPrimitives, dMortonCodeSorted, dIndicesSorted, dTree);
 
   CudaBVHBuildNode tree[2*nPrimitives - 1];
-  cudaMemcpy(tree, dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1), cudaMemcpyDeviceToHost);
+  cudaMemcpy(tree, dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyDeviceToHost);
 
   cudaFree(dMortonCodeSorted);
   cudaFree(dIndicesSorted);
@@ -90,6 +90,15 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
     EXPECT_EQ(tree[i].children[0], treeExpected[i].children[0]);
     EXPECT_EQ(tree[i].children[1], treeExpected[i].children[1]);
     EXPECT_EQ(tree[i].parent, treeExpected[i].parent);
+
+    if(i < nPrimitives - 1) {
+      // Interior node so dataIdx is -1
+      EXPECT_EQ(tree[i].dataIdx, -1);
+    }
+    if(i >= nPrimitives - 1) {
+      // Leaf node is dataIdx should be in [0, nPrimitives)
+      EXPECT_TRUE(tree[i].dataIdx >= 0 && tree[i].dataIdx < nPrimitives);
+    }
   }
 
 }
