@@ -174,6 +174,75 @@ __device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int number
     return __clz(key1 ^ key2);
 }
 
+/**
+ * Computes bounding boxes in Tree hierarchy on GPU
+ */
+void ComputeBoundingBoxes(int nPrimitives, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo) {
+    
+    dim3 blockSize(256, 1, 1);
+    dim3 gridSize((nPrimitives + (blockSize.x - 1)) / blockSize.x, 1, 1);
+
+    int* dInteriorNodeCounter;
+    cudaMalloc(&dInteriorNodeCounter, (nPrimitives - 1) * sizeof(int));
+    cudaMemset(dInteriorNodeCounter, -1, (nPrimitives - 1) * sizeof(int));
+
+    ComputeBoundingBoxesKernel<<<gridSize, blockSize>>>(nPrimitives, dTree, dPrimitiveInfo, dInteriorNodeCounter);
+
+    cudaFree(dInteriorNodeCounter);
+}
+
+
+/**
+  * Kernel to compute the bounding boxes
+  * 
+  * Remakrs: Makes not use of shared memory. One could improve this implementation 
+  * by using shared memory to cache the information to compute the bounding boxes
+  * 
+  */
+__global__ void ComputeBoundingBoxesKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter) {
+   
+    const int i = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Do nothing if we have more threads than required
+    if (i >= nPrimitives)
+    {
+        return;
+    }
+
+    const int index = i + (nPrimitives - 1);
+
+    tree[index].bounds = primitiveInfo[tree[index].dataIdx].bounds;
+
+    int currentIndex = tree[index].parent;
+    while (currentIndex != -1) {
+
+        int lastVisitedThreadId = atomicExch(&interiorNodeCounter[currentIndex], i);
+        if (lastVisitedThreadId == -1) {
+            // We are the first thread to visit the interior node, so we return
+            return;
+        }
+
+        int leftIndex = tree[currentIndex].children[0];
+        int rightIndex = tree[currentIndex].children[1];
+
+        BoundingBoxUnion(tree[leftIndex].bounds, tree[rightIndex].bounds, &tree[currentIndex].bounds);
+
+        currentIndex = tree[currentIndex].parent;
+
+    }
+}
+
+__device__ void BoundingBoxUnion(Bounds3f bIn1, Bounds3f bIn2, Bounds3f* bOut) {
+
+    bOut->pMin.x = min(bIn1.pMin.x, bIn2.pMin.x);
+    bOut->pMin.y = min(bIn1.pMin.y, bIn2.pMin.y);
+    bOut->pMin.z = min(bIn1.pMin.z, bIn2.pMin.z);
+
+    bOut->pMax.x = max(bIn1.pMax.x, bIn2.pMax.x);
+    bOut->pMax.y = max(bIn1.pMax.y, bIn2.pMax.y);
+    bOut->pMax.z = max(bIn1.pMax.z, bIn2.pMax.z);
+
+}
 
 
 NAMESPACE_DPHPC_END

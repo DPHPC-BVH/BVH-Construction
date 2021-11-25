@@ -43,6 +43,13 @@ __global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCo
 __device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int numberOfElements,
         int index1, int index2, unsigned int key1);
 
+void ComputeBoundingBoxes(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
+
+__global__ void ComputeBoundingBoxesKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
+
+__device__ void BoundingBoxUnion(Bounds3f bIn1, Bounds3f bIn2, Bounds3f* bOut);
+
+
 /**
  * Computes the sign function
  */

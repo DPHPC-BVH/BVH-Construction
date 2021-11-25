@@ -34,30 +34,34 @@ void CudaBVHBuilder::BuildBVH() {
 	unsigned int* dMortonCodes;
 	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
 	unsigned int* dMortonIndices;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+	cudaMalloc(&dMortonIndices, sizeof(unsigned int) * nPrimitives);
 	GenerateMortonCodes32(nPrimitives, dPrimitiveInfo, dMortonCodes, dMortonIndices);
 	
 	// 2. Sort Morton Codes
 	unsigned int* dMortonCodesSorted;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+	cudaMalloc(&dMortonCodesSorted, sizeof(unsigned int) * nPrimitives);
 	unsigned int* dMortonIndicesSorted;
-	cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+	cudaMalloc(&dMortonIndicesSorted, sizeof(unsigned int) * nPrimitives);
 	DeviceSort(nPrimitives, &dMortonCodes, &dMortonCodesSorted,
                  &dMortonIndices, &dMortonIndicesSorted);
+	cudaFree(dMortonCodes);
+	cudaFree(dMortonIndices);
 
 	// 3. Build tree hierarchy of CudaBVHBuildNodes
 	CudaBVHBuildNode* dTree;
 	cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
 	BuildTreeHierarchy(nPrimitives, dMortonCodesSorted, dMortonIndicesSorted, dTree);
+	cudaFree(dMortonCodesSorted);
+	cudaFree(dMortonIndicesSorted);
 
 	// 4. Compute Bounding Boxes of each node
-	
-	
-	// 5. Flatten Tree
-
-
-	// 6. Don't forget to free  memory
+	ComputeBoundingBoxes(nPrimitives, dTree, dPrimitiveInfo);
+	CudaBVHBuildNode treeWithBoundingBoxes[2*nPrimitives - 1];
+  	cudaMemcpy(treeWithBoundingBoxes, dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyDeviceToHost);
 	cudaFree(dPrimitiveInfo);
+	cudaFree(dTree);
+
+	// 5. Flatten Tree
 
 
 }

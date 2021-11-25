@@ -52,7 +52,6 @@ public:
 
 private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
-	uint32_t* mortonCodes;
 
 };
 
