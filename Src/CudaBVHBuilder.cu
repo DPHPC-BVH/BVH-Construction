@@ -61,7 +61,7 @@ __global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCo
     }
 
     // Thread i takes care of internal node with key 'key1'
-    const unsigned int key1 = indicesSorted[i];
+    const unsigned int key1 = mortonCodesSorted[i];
 
     // Determine direction of the range (+1 or -1)
     int lcp1 = LongestCommonPrefix(mortonCodesSorted, nPrimitives, i, i + 1, key1);
@@ -77,24 +77,27 @@ __global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCo
 
     // Find the other end using binary search
     int l = 0;
-    int t = lMax / 2;
-    while (t >= 1) {
+    int t = lMax;
+    while (t > 1) {
+        t = t / 2;
         if(LongestCommonPrefix(mortonCodesSorted, nPrimitives, i, i + (l + t) * d, key1) > minLcp) {
             l += t;
         }
-        t = t / 2;
     }
     int j = i + l * d;
 
     // Find the split position using binary search
     int nodeLcp = LongestCommonPrefix(mortonCodesSorted, nPrimitives, i, j, key1);
     int s = 0;
-    t = divCeil(l,2);
-    while (t >= 1) {
+    t = l;
+    int divisor = 2;
+    const int maxDivisor = 1 << (32 - __clz(l));
+    while (divisor <= maxDivisor) {
+        t = divCeil(l, divisor);
         if(LongestCommonPrefix(mortonCodesSorted, nPrimitives, i, i + (s + t) * d, key1) > nodeLcp) {
             s += t;
         }
-        t = divCeil(t,2);
+        divisor *= 2;
     }
     int splitPosition = i + s * d + min(d, 0);
 
@@ -140,6 +143,9 @@ __global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCo
     // Update parent index of children
     tree[leftIndex].parent = i;
     tree[rightIndex].parent = i;
+
+    // Set dataIdx to -1, i is since interior node
+    tree[i].dataIdx = -1;
 
     // Handle special case of the root
     if(i == 0) {

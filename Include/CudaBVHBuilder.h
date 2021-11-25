@@ -25,6 +25,7 @@ struct BVHPrimitiveInfoWithIndex {
 // We are using indices instead of pointers to allow direct copying of the nodes from device to host.
 struct CudaBVHBuildNode {
 	CudaBVHBuildNode() : children{-1, -1}, parent(-1), dataIdx(-1) {}
+	CudaBVHBuildNode(int left, int right, int parent) : children{left, right}, parent(parent) {}
 
 	Bounds3f bounds;
 	// The indices specifying the location of the children in an array of CudaBVHBuildNode's.
