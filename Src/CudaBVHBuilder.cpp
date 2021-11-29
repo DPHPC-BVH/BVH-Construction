@@ -1,9 +1,9 @@
 #include "CudaBVHBuilder.h"
 #include "CudaBVHBuilder.cuh"
 #include "CubWrapper.cuh"
+#include "Utilities.h"
 
 NAMESPACE_DPHPC_BEGIN
-
 
 
 CudaBVHBuilder::CudaBVHBuilder(BVH& bvh) 
@@ -44,6 +44,8 @@ void CudaBVHBuilder::BuildBVH() {
 	cudaMalloc(&dMortonIndicesSorted, sizeof(unsigned int) * nPrimitives);
 	DeviceSort(nPrimitives, &dMortonCodes, &dMortonCodesSorted,
                  &dMortonIndices, &dMortonIndicesSorted);
+	unsigned int indicesSorted[nPrimitives];
+	cudaMemcpy(indicesSorted, dMortonIndicesSorted, nPrimitives * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 	cudaFree(dMortonCodes);
 	cudaFree(dMortonIndices);
 
@@ -61,9 +63,35 @@ void CudaBVHBuilder::BuildBVH() {
 	cudaFree(dPrimitiveInfo);
 	cudaFree(dTree);
 
-	// 5. Flatten Tree
+	// 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
+	// Remarks: We could maybe do this more efficient in GPU?
+	applyPermutation(bvh.primitives, indicesSorted, nPrimitives);
+	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);
+	int offset = 0;
+	FlattenBVHTree(treeWithBoundingBoxes, 0, &offset, nPrimitives);
+
+}
 
 
+int CudaBVHBuilder::FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives) {
+	LinearBVHNode* linearNode = &bvh.nodes[*offset];
+	CudaBVHBuildNode node = nodes[nodeIndex];
+	linearNode->bounds = node.bounds;
+	int myOffset = (*offset)++;
+	if (node.children[0] == -1 && node.children[1] == -1) {
+		linearNode->primitivesOffset = nodeIndex - (totalPrimitives - 1);
+		linearNode->nPrimitives = 1;
+	}
+	else {
+		// Create interior flattened BVH node
+		linearNode->axis = 0;
+		linearNode->nPrimitives = 0;
+		FlattenBVHTree(nodes, node.children[0], offset, totalPrimitives);
+		linearNode->secondChildOffset =
+			FlattenBVHTree(nodes, node.children[1], offset, totalPrimitives);
+	}
+
+	return myOffset;
 }
 
 

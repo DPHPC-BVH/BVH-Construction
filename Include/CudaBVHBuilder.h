@@ -52,6 +52,7 @@ public:
 
 private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
+	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
 
 };
 

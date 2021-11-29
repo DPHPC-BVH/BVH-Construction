@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include "RecursiveBVHBuilder.h"
+#include "CudaBVHBuilder.h"
 
 NAMESPACE_DPHPC_BEGIN
 using namespace tinyobj;
@@ -54,7 +55,8 @@ void Scene::LoadMesh(std::string path) {
 
 	// Build BVH.
 	bvh = BVH(pTriangles);
-	RecursiveBVHBuilder builder(bvh);  // todo: Select different builder
+	RecursiveBVHBuilder builder(bvh);
+	//CudaBVHBuilder builder(bvh);  // todo: Select different builder
 	builder.BuildBVH();
 
 }
