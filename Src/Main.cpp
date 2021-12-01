@@ -10,14 +10,14 @@ int main(int argc, char** argv) {
 	ParallelInit();
 
 	std::string meshes[4] = {
-		"Scenes/conference/conference.obj",
-		"Scenes/fairyforest/fairyforest.obj",
-		"Scenes/sibenik/sibenik.obj",
-		"Scenes/sanmiguel/sanmiguel.obj"
+		"../../Scenes/conference/conference.obj",
+		"../../Scenes/fairyforest/fairyforest.obj",
+		"../../Scenes/sibenik/sibenik.obj",
+		"../../Scenes/sanmiguel/sanmiguel.obj"
 	};
 
 	Renderer::RenderOption options[4] = {
-		{Point2i(1600, 900), 64, 15.0f},
+		{Point2i(400, 300), 64, 15.0f},
 		{Point2i(1600, 900), 32, 3.0f},
 		{Point2i(1600, 900), 32, 10.0f},
 		{Point2i(1600, 900), 32, 1.5f}
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 
 	renderer.Render();
 	
-	renderer.WriteImage("Scenes/result.pfm");
+	renderer.WriteImage("../../Scenes/result.pfm");
 
 	ParallelCleanup();
 }

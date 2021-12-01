@@ -27,7 +27,11 @@ void Scene::LoadMesh(std::string path) {
 	std::vector<material_t> materials;
 	std::string warning;
 	std::string error;
-	tinyobj::LoadObj(&attribute, &shapes, &materials, &warning, &error, path.c_str(), nullptr, true/*with triangulation*/);
+	bool bSucceed = tinyobj::LoadObj(&attribute, &shapes, &materials, &warning, &error, path.c_str(), nullptr, true/*with triangulation*/);
+	if (!bSucceed) {
+		std::cout << error;
+		std::abort();
+	}
 
 	int numIndices = 0;
 	numVertices = attribute.vertices.size() / 3;
@@ -55,8 +59,8 @@ void Scene::LoadMesh(std::string path) {
 
 	// Build BVH.
 	bvh = BVH(pTriangles);
-	RecursiveBVHBuilder builder(bvh);
-	//CudaBVHBuilder builder(bvh);  // todo: Select different builder
+	//RecursiveBVHBuilder builder(bvh);
+	CudaBVHBuilder builder(bvh);  // todo: Select different builder
 	builder.BuildBVH();
 
 }
