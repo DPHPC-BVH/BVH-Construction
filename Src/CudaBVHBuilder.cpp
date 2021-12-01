@@ -70,7 +70,6 @@ void CudaBVHBuilder::BuildBVH() {
 	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);
 	int offset = 0;
 	FlattenBVHTree(treeWithBoundingBoxes.data(), 0, &offset, nPrimitives);
-	// todo: Shouldn't treeWithBoundingBoxes and dPrimitiveInfo be members?
 }
 
 
