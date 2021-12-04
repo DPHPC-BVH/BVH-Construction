@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
 	};
 
 	Renderer::RenderOption options[4] = {
-		{Point2i(400, 300), 64, 15.0f},
+		{Point2i(1600, 900), 64, 15.0f},
 		{Point2i(1600, 900), 32, 3.0f},
 		{Point2i(1600, 900), 32, 10.0f},
 		{Point2i(1600, 900), 32, 1.5f}
