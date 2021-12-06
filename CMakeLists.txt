@@ -11,7 +11,8 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RELEASE")
 endif ()
 
-option(BVH_TEST "BVH_TEST" ON)
+option(BVH_TEST 		"BVH_TEST" 		ON)
+option(BVH_BENCH       	"BVH_BENCH"     ON)
 
 set(BVH_LIB_NAME dphpcbvh)
 set(BVH_LIB_TYPE SHARED)
@@ -56,4 +57,8 @@ if (BVH_TEST)
 	# END INSTALL 
 	enable_testing()
 	add_subdirectory(Test)
+endif ()
+
+if (BVH_BENCH)
+  add_subdirectory(Bench)
 endif ()
