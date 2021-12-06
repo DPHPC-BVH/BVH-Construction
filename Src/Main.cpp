@@ -1,12 +1,37 @@
 #include "Scene.h"
 #include "Renderer.h"
 #include "Parallel.h"
+#include "Argparse.h"
 
 using namespace DPHPC;
 
 
 
 int main(int argc, char** argv) {
+
+	argparse::ArgumentParser program("main");
+
+	program.add_argument("-s", "--scene")
+  	.help("Choose the scene, conference (0), fairyforest (1), sibenik (2), sanmiguel (3)")
+	.scan<'i', int>()
+  	.default_value(0);
+	
+	program.add_argument("--construction-only")
+  	.help("If enabled no rendering is done")
+  	.default_value(false)
+	.implicit_value(true);
+
+	try {
+  		program.parse_args(argc, argv);
+	}	
+	catch (const std::runtime_error& err) {
+  		std::cerr << err.what() << std::endl;
+  		std::cerr << program;
+  		std::exit(1);
+	}
+
+
+
 	ParallelInit();
 
 	std::string meshes[4] = {
@@ -30,17 +55,20 @@ int main(int argc, char** argv) {
 		"Yciwz1oRQmz/Xvsm005CwjHx/b70nx18tVI7005frY108Y/:x/v3/z100"
 	};
 
-	int idx = 0;
+	int idx = program.get<int>("--scene");
 
 	Scene scene;
 	scene.LoadMesh(meshes[idx]);
-	
-	Renderer renderer(scene, options[idx]);
-	renderer.LoadCameraSignature(CameraSignatures[idx]);
 
-	renderer.Render();
+	if(program.get<bool>("--construction-only") == false) {
+		Renderer renderer(scene, options[idx]);
+		renderer.LoadCameraSignature(CameraSignatures[idx]);
+
+		renderer.Render();
 	
-	renderer.WriteImage("Scenes/result.pfm");
+		renderer.WriteImage("Scenes/result.pfm");
+	}
+	
 
 	ParallelCleanup();
 }
