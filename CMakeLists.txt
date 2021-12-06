@@ -34,27 +34,6 @@ set(CMAKE_C_FLAGS "-O3")
 add_subdirectory(Src)
 
 if (BVH_TEST)
-	# BEGIN Install googletest
-	include(FetchContent)
-	FetchContent_Declare(
-  	googletest
-  	GIT_REPOSITORY https://github.com/google/googletest.git
-  	GIT_TAG        release-1.11.0
-	)
-
-	FetchContent_GetProperties(googletest)
-
-	if(NOT googletest_POPULATED)
-		FetchContent_Populate(googletest)
-			set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-			set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-			# add the targets: gtest,gtest_main,gmock,gmock_main
-			add_subdirectory(
-				${googletest_SOURCE_DIR}
-				${googletest_BINARY_DIR}
-			)
-	endif()
-	# END INSTALL 
 	enable_testing()
 	add_subdirectory(Test)
 endif ()
