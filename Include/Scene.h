@@ -4,16 +4,20 @@
 #include "Geometry.h"
 #include "Triangle.h"
 #include "BVH.h"
+#include "BVHBuilder.h"
 
 
 NAMESPACE_DPHPC_BEGIN
 class Scene {
 	friend class Renderer;
 public:
-	void LoadMesh(std::string path);
+	void LoadMesh(std::string path, BVHBuilderType type);
 	Scene();
 
 private:
+	void LoadMeshFromFile(std::string path);
+	void BuildBVH(BVHBuilderType type);
+	
 	int numTriangles;
 	int numVertices;
 

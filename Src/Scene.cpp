@@ -5,6 +5,7 @@
 #include <iostream>
 #include "RecursiveBVHBuilder.h"
 #include "CudaBVHBuilder.h"
+#include "BVHBuilder.h"
 
 NAMESPACE_DPHPC_BEGIN
 using namespace tinyobj;
@@ -21,7 +22,12 @@ Scene::Scene() :
 
 
 
-void Scene::LoadMesh(std::string path) {
+void Scene::LoadMesh(std::string path, BVHBuilderType type) {
+	Scene::LoadMeshFromFile(path);
+	Scene::BuildBVH(type);
+}
+
+void Scene::LoadMeshFromFile(std::string path) {
 	attrib_t attribute;
 	std::vector<shape_t> shapes;
 	std::vector<material_t> materials;
@@ -45,21 +51,25 @@ void Scene::LoadMesh(std::string path) {
 
 	CHECK(numTriangles * 3 == numIndices);  // Guarantee all faces are triangles
 
-	std::vector<std::shared_ptr<Primitive>> pTriangles;
 	triangles.reserve(numTriangles);
-	pTriangles.reserve(numTriangles);
 	for (int i = 0; i < numTriangles; ++i) {
 		triangles.push_back(Triangle(i, vertexBuffer.data(), indexBuffer.data()));
+	}
+}
+
+void Scene::BuildBVH(BVHBuilderType type) {
+
+	std::vector<std::shared_ptr<Primitive>> pTriangles;
+	pTriangles.reserve(numTriangles);
+	for (int i = 0; i < numTriangles; ++i) {
 		pTriangles.push_back(std::make_shared<Triangle>(triangles[i]));
 	}
 
-	// Build BVH.
 	bvh = BVH(pTriangles);
-	RecursiveBVHBuilder builder(bvh);
-	//CudaBVHBuilder builder(bvh);  // todo: Select different builder
-	builder.BuildBVH();
-
+	BVHBuilder* builder = BVHBuilder::MakeBVHBuilder(type, &bvh);
+	builder->BuildBVH();
 }
+
 
 
 NAMESPACE_DPHPC_END
