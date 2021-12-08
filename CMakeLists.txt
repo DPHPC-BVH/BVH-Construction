@@ -11,8 +11,8 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RELEASE")
 endif ()
 
-option(BVH_TEST 		"BVH_TEST" 		ON)
-option(BVH_BENCH       	"BVH_BENCH"     ON)
+option(BVH_TEST 		    "BVH_TEST" 		ON)
+option(BVH_BENCH       	"BVH_BENCH"   ON)
 
 set(BVH_LIB_NAME dphpcbvh)
 set(BVH_LIB_TYPE SHARED)
@@ -29,6 +29,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-O3")
 set(CMAKE_C_FLAGS "-O3")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 
 add_subdirectory(Src)
