@@ -5,6 +5,8 @@ include_directories(benchmark/include)
 
 set(bench_cc
   TestBenchmarkFramework.cc
+  BenchmarkBVHBuilder.cc
+  CudaBenchmarkUtil.cu
 )
 
 add_executable(bench_dphp_bvh ${bench_cc})
