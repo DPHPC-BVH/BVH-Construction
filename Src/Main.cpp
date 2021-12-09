@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 		};
 	program.add_argument("--method")
   	.help("Chooses BVH constructions methods. Possible choices: recursive, gpu.")
-  	.default_value("recursive")
+  	.default_value(BVHBuilderType::RecursiveBVHBuilder)
 	.action([](const std::string& value) {
 		auto search = BVHConstructionTypes.find(value);
     	if (search != BVHConstructionTypes.end()) {
@@ -36,7 +36,6 @@ int main(int argc, char** argv) {
     	}
     	return BVHBuilderType::RecursiveBVHBuilder;
   	});
-
 
 	try {
   		program.parse_args(argc, argv);
@@ -74,6 +73,8 @@ int main(int argc, char** argv) {
 
 	int idx = program.get<int>("--scene");
 	BVHBuilderType type = program.get<BVHBuilderType>("--method");
+
+
 
 	Scene scene;
 	scene.LoadMesh(meshes[idx], type);

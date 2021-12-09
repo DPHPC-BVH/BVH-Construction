@@ -150,8 +150,8 @@ void Renderer::Render() {
 			samples.reserve(option.numAOSamples);
 			for (int i = 0; i < option.numAOSamples; ++i) {
 				//samples.push_back(Point2f(Float(i)/option.numAOSamples, RadicalInverse(1, i)));  // Hammersley sequence
-				//samples.push_back(Point2f(RadicalInverse(1, i), RadicalInverse(2, i)));  // Halton sequence
-				samples.push_back(Point2f(1.0f * std::rand() / RAND_MAX, 1.0f * std::rand() / RAND_MAX));
+				samples.push_back(Point2f(RadicalInverse(2, i), RadicalInverse(3, i)));  // Halton 2-3 sequence
+				// samples.push_back(Point2f(1.0f * std::rand() / RAND_MAX, 1.0f * std::rand() / RAND_MAX));
 			}
 
 
@@ -167,8 +167,18 @@ void Renderer::Render() {
 			if (scene.bvh.Intersect(primaryRay, &primaryIntersection)) {
 				// Generate an arbitrary coordinate system
 				Vector3f n = Vector3f(Faceforward(primaryIntersection.n, -primaryRay.d));
+				Vector3f s0, t0;
+				CoordinateSystem(n, &s0, &t0);
+				
+				// Rotate the coord using a random angle for each pixel
+				float angle = 2.0f * Pi * std::rand() / RAND_MAX;
+				float cos = std::cos(angle);
+				float sin = std::sin(angle);
+
 				Vector3f s, t;
-				CoordinateSystem(n, &s, &t);
+				s = s0 * cos + t0 * sin;
+				t = s0 * -sin + t0 * cos;
+
 				
 				for (int i = 0; i < option.numAOSamples; ++i) 		{
 					const bool cosSample = false;
