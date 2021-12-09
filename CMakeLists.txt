@@ -27,9 +27,10 @@ include_directories(${PROJECT_SOURCE_DIR}/Include ${CUDA_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-O3")
-set(CMAKE_C_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-O3 -save-temps")
+set(CMAKE_C_FLAGS "-O3 -save-temps")
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_CUDA_FLAGS "--keep")
 
 
 add_subdirectory(Src)
