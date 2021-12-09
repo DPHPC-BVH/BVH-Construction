@@ -1,3 +1,5 @@
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 set(bvh_src
     BVH.cpp
     BVHBuilder.cpp

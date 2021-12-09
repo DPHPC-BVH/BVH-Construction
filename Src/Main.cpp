@@ -10,10 +10,10 @@ int main(int argc, char** argv) {
 	ParallelInit();
 
 	std::string meshes[4] = {
-		"Scenes/conference/conference.obj",
-		"Scenes/fairyforest/fairyforest.obj",
-		"Scenes/sibenik/sibenik.obj",
-		"Scenes/sanmiguel/sanmiguel.obj"
+		"../../Scenes/conference/conference.obj",
+		"../../Scenes/fairyforest/fairyforest.obj",
+		"../../Scenes/sibenik/sibenik.obj",
+		"../../Scenes/sanmiguel/sanmiguel.obj"
 	};
 
 	Renderer::RenderOption options[4] = {
@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 
 	renderer.Render();
 	
-	renderer.WriteImage("Scenes/result.pfm");
+	renderer.WriteImage("../../Scenes/result.pfm");
 
 	ParallelCleanup();
 }
