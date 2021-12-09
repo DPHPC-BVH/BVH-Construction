@@ -54,6 +54,18 @@ private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
 
+	BVHPrimitiveInfoWithIndex* PrepareDevicePrimitiveInfo(int nPrimitives);
+
+	void GenerateMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int** dMortonCodes,
+			unsigned int** dMortonIndices, int nPrimitives);
+
+	unsigned int* SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
+			unsigned int* dMortonIndices, unsigned int** dMortonCodesSorted, unsigned int** dMortonIndicesSorted, int nPrimitives);
+	
+	CudaBVHBuildNode* BuildTreeHierarchyHelper(unsigned int* dMortonCodesSorted, unsigned int* dMortonIndicesSorted, int nPrimitives);
+
+	CudaBVHBuildNode* ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives);
+
 };
 
 
