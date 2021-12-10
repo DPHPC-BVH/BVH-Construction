@@ -23,8 +23,8 @@ NAMESPACE_DPHPC_BEGIN
 /**
  * Warms up GPU for benchmarking
  */
-void WarmUpGPU();
-__global__ void WarmUpGPUKernel();
+float WarmUpGPU();
+__global__ void WarmUpGPUKernel(float* dData);
 
 
 
