@@ -15,7 +15,7 @@ option(BVH_TEST 		    "BVH_TEST" 		ON)
 option(BVH_BENCH       	"BVH_BENCH"   ON)
 
 set(BVH_LIB_NAME dphpcbvh)
-set(BVH_LIB_TYPE SHARED)
+set(BVH_LIB_TYPE STATIC)
 
 # Find CUDA and later include $CUDA_INCLUDE_DIRS
 find_package(CUDA 11.0 REQUIRED)
