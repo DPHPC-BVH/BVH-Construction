@@ -3,10 +3,10 @@
 #include <chrono>
 
 // Nasty hack such that we can benchmark private functions
-#define private public
+//#define private public
 #include "Scene.h"
 #include "CudaBVHBuilder.h"
-#undef private
+//#undef private
 
 NAMESPACE_DPHPC_BEGIN
 

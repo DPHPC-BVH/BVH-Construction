@@ -4,6 +4,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+// Nasty hack such that we can benchmark private functions
+#define private public
 
 NAMESPACE_DPHPC_BEGIN
 
@@ -73,3 +75,6 @@ private:
 
 
 NAMESPACE_DPHPC_END
+
+// Nasty hack such that we can benchmark private functions
+#undef private

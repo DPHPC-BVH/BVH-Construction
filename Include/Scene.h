@@ -6,6 +6,9 @@
 #include "BVH.h"
 #include "BVHBuilder.h"
 
+ // Nasty hack such that we can benchmark private functions
+#define private public
+
 
 NAMESPACE_DPHPC_BEGIN
 class Scene {
@@ -30,6 +33,10 @@ private:
 };
 
 
+
 NAMESPACE_DPHPC_END
+
+// Nasty hack such that we can benchmark private functions
+#undef private
 
 
