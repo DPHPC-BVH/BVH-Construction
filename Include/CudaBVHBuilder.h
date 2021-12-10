@@ -66,6 +66,9 @@ private:
 
 	CudaBVHBuildNode* ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives);
 
+	void PermutePrimitivesAndFlattenTree(unsigned int* indicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives);
+
+
 };
 
 

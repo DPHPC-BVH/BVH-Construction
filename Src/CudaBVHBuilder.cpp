@@ -45,13 +45,7 @@ void CudaBVHBuilder::BuildBVH() {
 
 	// 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
 	// Remarks: We could maybe do this more efficient in GPU?
-	applyPermutation(bvh.primitives, indicesSorted, nPrimitives);
-	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);
-	int offset = 0;
-	FlattenBVHTree(treeWithBoundingBoxes, 0, &offset, nPrimitives);
-
-	free(treeWithBoundingBoxes);
-	free(indicesSorted);
+	CudaBVHBuilder::PermutePrimitivesAndFlattenTree(indicesSorted, treeWithBoundingBoxes, nPrimitives);
 
 
 }
@@ -106,6 +100,17 @@ CudaBVHBuildNode* CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWit
 	cudaFree(dTree);
 
 	return treeWithBoundingBoxes;
+}
+
+void CudaBVHBuilder::PermutePrimitivesAndFlattenTree(unsigned int* indicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives) {
+	
+	applyPermutation(bvh.primitives, indicesSorted, nPrimitives);
+	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);
+	int offset = 0;
+	FlattenBVHTree(treeWithBoundingBoxes, 0, &offset, nPrimitives);
+
+	free(treeWithBoundingBoxes);
+	free(indicesSorted);
 }
 
 
