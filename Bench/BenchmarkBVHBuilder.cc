@@ -1,6 +1,7 @@
 #include "benchmark/benchmark.h"
 #include "CudaBenchmarkUtil.cuh"
 #include <chrono>
+#include "Timer.h"
 
 // Nasty hack such that we can benchmark private functions
 //#define private public
@@ -64,22 +65,31 @@ template <int SceneIndex> static void BM_CudaBVHBuilder(benchmark::State& state)
         scene = new Scene();
         scene->LoadMeshFromFile(ScenePath);
 
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
-        
+        timer.Start();
+
         scene->BuildBVH(BVHBuilderType::CudaBVHBuilder);
         
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
+        state.PauseTiming();
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
+        state.ResumeTiming();
     }
     state.counters["primitives"] = scene->numTriangles;
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 0)->Name("BM_CudaBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 1)->Name("BM_CudaBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 2)->Name("BM_CudaBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 0)->Name("BM_CudaBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 1)->Name("BM_CudaBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 2)->Name("BM_CudaBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 /**
  * This function benchmarks the code to generate morton code in CudaBVHBuilder. Loading the mesh from the file is excluded.
@@ -112,18 +122,23 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benc
         const unsigned int nPrimitives = builder->primitiveInfo.size();
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
 
-        // Start measure
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
+        timer.Start();
         
         // 1. Compute Morton Codes
         unsigned int* dMortonCodes;
 	    unsigned int* dMortonIndices;
 	    builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
         
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
-        // End measure
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
         cudaFree(dMortonCodes);
@@ -138,10 +153,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benc
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 0)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 1)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 2)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 3)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 0)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 1)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 2)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 3)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 /**
  * This function benchmarks the code to sort morton code in CudaBVHBuilder.
@@ -179,19 +194,23 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
 	    unsigned int* dMortonIndices;
         builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
 
-        // Start measure
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
+        timer.Start();
         
         // 2. Sort Morton Codes
         unsigned int* dMortonCodesSorted;
 	    unsigned int* dMortonIndicesSorted;
 	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
         
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
-        // End measure
-
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
         cudaFree(dMortonCodesSorted);
@@ -206,10 +225,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 0)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 1)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 2)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 0)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 1)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 2)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 /**
  * This function benchmarks the code to build the three hierarchy in CudaBVHBuilder.
@@ -252,16 +271,21 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
 	    unsigned int* dMortonIndicesSorted;
 	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
 
-        // Start measure
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
+        timer.Start();
         
         // 3. Build tree hierarchy of CudaBVHBuildNodes
         CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
        
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
-        // End measure
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
         cudaFree(dTree);
@@ -275,10 +299,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 0)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 1)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 2)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 0)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 1)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 2)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 
 /**
@@ -325,16 +349,21 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
         // 3. Build tree hierarchy of CudaBVHBuildNodes
         CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
 
-        // Start measure
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
+        timer.Start();
         
         // 4. Compute Bounding Boxes of each node
 	    CudaBVHBuildNode* treeWithBoundingBoxes = builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
 
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
-        // End measure
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
         free(treeWithBoundingBoxes);
@@ -347,10 +376,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 
 /**
@@ -400,16 +429,21 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         // 4. Compute Bounding Boxes of each node
         CudaBVHBuildNode* treeWithBoundingBoxes = builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
 
-        // Start measure
-        CUDA_SYNC_CHECK();
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
         state.ResumeTiming();
+        timer.Start();
         
         // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
         builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, treeWithBoundingBoxes, nPrimitives);
        
-        CUDA_SYNC_CHECK();
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
-        // End measure
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
         delete builder;
@@ -421,10 +455,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 0)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 1)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 2)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true);
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 3)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true);
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 0)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 1)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 2)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 3)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 
 BENCHMARK_MAIN();

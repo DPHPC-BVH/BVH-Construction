@@ -7,6 +7,7 @@ set(bench_cc
   TestBenchmarkFramework.cc
   BenchmarkBVHBuilder.cc
   CudaBenchmarkUtil.cu
+  Timer.cpp
 )
 
 add_executable(bench_dphp_bvh ${bench_cc})
