@@ -92,6 +92,86 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 2)->Name("BM_CudaBVHBuilder/" + SceneNames
 BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 /**
+ * This function benchmarks the code that computes the bounding boxes in CudaBVHBuilder.
+ */
+template <int SceneIndex> static void BM_CudaBVHBuilderAlgorithmOnly(benchmark::State& state) {
+    
+    Scene* scene;
+    const std::string SceneName = SceneNames[SceneIndex];
+    const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+
+    // WarmUp GPU
+    WarmUpGPU();
+
+    for (auto _ : state) {
+        
+        state.PauseTiming();
+        scene = new Scene();
+        // Load mesh from file
+        scene->LoadMeshFromFile(ScenePath);
+
+        // Prepare data for BVH construction
+        std::vector<std::shared_ptr<Primitive>> pTriangles;
+	    pTriangles.reserve(scene->numTriangles);
+	    for (int i = 0; i < scene->numTriangles; ++i) {
+		    pTriangles.push_back(std::make_shared<Triangle>(scene->triangles[i]));
+	    }
+        scene->bvh = BVH(pTriangles);
+        CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
+
+        const unsigned int nPrimitives = builder->primitiveInfo.size();
+	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+
+        // Additional GPU Timer
+        TimerGPU timer;
+
+        // Start Timers
+        state.ResumeTiming();
+        timer.Start();
+        
+        // 1. Compute Morton Codes
+        unsigned int* dMortonCodes;
+	    unsigned int* dMortonIndices;
+        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+
+        // 2. Sort Morton Codes
+        unsigned int* dMortonCodesSorted;
+	    unsigned int* dMortonIndicesSorted;
+	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+
+        // 3. Build tree hierarchy of CudaBVHBuildNodes
+        CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
+
+        // 4. Compute Bounding Boxes of each node
+        builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+
+        // End Timers
+        double elapsed_microseconds = timer.Stop();
+        state.PauseTiming();
+        
+        // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
+        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, dTree, nPrimitives);
+        
+        state.SetIterationTime(elapsed_microseconds / 1e6);
+
+        // Clean Up
+        delete builder;
+
+        state.ResumeTiming();
+    }
+    state.counters["primitives"] = scene->numTriangles;
+    state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
+    delete scene;
+}
+
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 1)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 2)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 3)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+
+
+
+/**
  * This function benchmarks the code to generate morton code in CudaBVHBuilder. Loading the mesh from the file is excluded.
  */
 template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benchmark::State& state) {
