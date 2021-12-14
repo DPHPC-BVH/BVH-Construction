@@ -66,9 +66,9 @@ private:
 	
 	CudaBVHBuildNode* BuildTreeHierarchyHelper(unsigned int* dMortonCodesSorted, unsigned int* dMortonIndicesSorted, int nPrimitives);
 
-	CudaBVHBuildNode* ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives);
+	void ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives);
 
-	void PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives);
+	void PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* dTree, int nPrimitives);
 
 
 };

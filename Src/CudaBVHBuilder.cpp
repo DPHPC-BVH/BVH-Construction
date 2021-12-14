@@ -41,11 +41,11 @@ void CudaBVHBuilder::BuildBVH() {
 	CudaBVHBuildNode* dTree = CudaBVHBuilder::BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
 
 	// 4. Compute Bounding Boxes of each node
-	CudaBVHBuildNode* treeWithBoundingBoxes = CudaBVHBuilder::ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+	CudaBVHBuilder::ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
 
 	// 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
 	// Remarks: We could maybe do this more efficient in GPU?
-	CudaBVHBuilder::PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, treeWithBoundingBoxes, nPrimitives);
+	CudaBVHBuilder::PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, dTree, nPrimitives);
 
 
 }
@@ -86,22 +86,21 @@ CudaBVHBuildNode* CudaBVHBuilder::BuildTreeHierarchyHelper(unsigned int* dMorton
 	return dTree;
 }
 
-CudaBVHBuildNode* CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives) {
+void CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives) {
 	
 	ComputeBoundingBoxes(nPrimitives, dTree, dPrimitiveInfo);
-	CudaBVHBuildNode* treeWithBoundingBoxes = (CudaBVHBuildNode*) malloc((2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode));
-	cudaMemcpy(treeWithBoundingBoxes, dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyDeviceToHost);
 	cudaFree(dPrimitiveInfo);
-	cudaFree(dTree);
-
-	return treeWithBoundingBoxes;
 }
 
-void CudaBVHBuilder::PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives) {
+void CudaBVHBuilder::PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* dTree, int nPrimitives) {
 	
 	unsigned int* indicesSorted = (unsigned int*) malloc(nPrimitives * sizeof(unsigned int));
 	cudaMemcpy(indicesSorted, dMortonIndicesSorted, nPrimitives * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 	cudaFree(dMortonIndicesSorted);
+
+	CudaBVHBuildNode* treeWithBoundingBoxes = (CudaBVHBuildNode*) malloc((2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode));
+	cudaMemcpy(treeWithBoundingBoxes, dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyDeviceToHost);
+	cudaFree(dTree);
 	
 	applyPermutation(bvh.primitives, indicesSorted, nPrimitives);
 	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);

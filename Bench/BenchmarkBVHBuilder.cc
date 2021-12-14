@@ -357,7 +357,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
         timer.Start();
         
         // 4. Compute Bounding Boxes of each node
-	    CudaBVHBuildNode* treeWithBoundingBoxes = builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+	    builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
 
         // End Timers
         double elapsed_microseconds = timer.Stop();
@@ -366,7 +366,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
-        free(treeWithBoundingBoxes);
+        cudaFree(dTree);
         delete builder;
 
         state.ResumeTiming();
@@ -427,7 +427,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
 
         // 4. Compute Bounding Boxes of each node
-        CudaBVHBuildNode* treeWithBoundingBoxes = builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+        builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -437,7 +437,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         timer.Start();
         
         // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
-        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, treeWithBoundingBoxes, nPrimitives);
+        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, dTree, nPrimitives);
        
         // End Timers
         double elapsed_microseconds = timer.Stop();
