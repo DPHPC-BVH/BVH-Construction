@@ -186,7 +186,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
         // 2. Sort Morton Codes
         unsigned int* dMortonCodesSorted;
 	    unsigned int* dMortonIndicesSorted;
-	    unsigned int* indicesSorted = builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
         
         CUDA_SYNC_CHECK();
         state.PauseTiming();
@@ -197,7 +197,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
         cudaFree(dMortonCodesSorted);
         cudaFree(dMortonIndicesSorted);
         cudaFree(dPrimitiveInfo);
-        free(indicesSorted);
         delete builder;
 
         state.ResumeTiming();
@@ -251,7 +250,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
         // 2. Sort Morton Codes
         unsigned int* dMortonCodesSorted;
 	    unsigned int* dMortonIndicesSorted;
-	    unsigned int* indicesSorted = builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
 
         // Start measure
         CUDA_SYNC_CHECK();
@@ -267,7 +266,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
         // Clean Up
         cudaFree(dTree);
         cudaFree(dPrimitiveInfo);
-        free(indicesSorted);
         delete builder;
 
         state.ResumeTiming();
@@ -322,7 +320,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
         // 2. Sort Morton Codes
         unsigned int* dMortonCodesSorted;
 	    unsigned int* dMortonIndicesSorted;
-	    unsigned int* indicesSorted = builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
 
         // 3. Build tree hierarchy of CudaBVHBuildNodes
         CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
@@ -339,7 +337,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
         // End measure
 
         // Clean Up
-        free(indicesSorted);
         free(treeWithBoundingBoxes);
         delete builder;
 
@@ -395,7 +392,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         // 2. Sort Morton Codes
         unsigned int* dMortonCodesSorted;
 	    unsigned int* dMortonIndicesSorted;
-	    unsigned int* indicesSorted = builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
 
         // 3. Build tree hierarchy of CudaBVHBuildNodes
         CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
@@ -408,7 +405,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         state.ResumeTiming();
         
         // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
-        builder->PermutePrimitivesAndFlattenTree(indicesSorted, treeWithBoundingBoxes, nPrimitives);
+        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, treeWithBoundingBoxes, nPrimitives);
        
         CUDA_SYNC_CHECK();
         state.PauseTiming();

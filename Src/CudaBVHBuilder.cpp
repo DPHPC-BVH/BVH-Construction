@@ -35,7 +35,7 @@ void CudaBVHBuilder::BuildBVH() {
 	// 2. Sort Morton Codes
 	unsigned int* dMortonCodesSorted;
 	unsigned int* dMortonIndicesSorted;
-	unsigned int* indicesSorted = CudaBVHBuilder::SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	CudaBVHBuilder::SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
 
 	// 3. Build tree hierarchy of CudaBVHBuildNodes
 	CudaBVHBuildNode* dTree = CudaBVHBuilder::BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
@@ -45,7 +45,7 @@ void CudaBVHBuilder::BuildBVH() {
 
 	// 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
 	// Remarks: We could maybe do this more efficient in GPU?
-	CudaBVHBuilder::PermutePrimitivesAndFlattenTree(indicesSorted, treeWithBoundingBoxes, nPrimitives);
+	CudaBVHBuilder::PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, treeWithBoundingBoxes, nPrimitives);
 
 
 }
@@ -64,19 +64,15 @@ void CudaBVHBuilder::GenerateMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimi
 	GenerateMortonCodes32(nPrimitives, dPrimitiveInfo, *dMortonCodes, *dMortonIndices);
 }
 
-unsigned int* CudaBVHBuilder::SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
+void CudaBVHBuilder::SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
 		unsigned int* dMortonIndices, unsigned int** dMortonCodesSorted, unsigned int** dMortonIndicesSorted, int nPrimitives) {
 	
 	cudaMalloc(dMortonCodesSorted, sizeof(unsigned int) * nPrimitives);
 	cudaMalloc(dMortonIndicesSorted, sizeof(unsigned int) * nPrimitives);
 	DeviceSort(nPrimitives, &dMortonCodes, dMortonCodesSorted,
 				&dMortonIndices, dMortonIndicesSorted);
-	unsigned int* indicesSorted = (unsigned int*) malloc(nPrimitives * sizeof(unsigned int));
-	cudaMemcpy(indicesSorted, *dMortonIndicesSorted, nPrimitives * sizeof(unsigned int), cudaMemcpyDeviceToHost);
 	cudaFree(dMortonCodes);
 	cudaFree(dMortonIndices);
-
-	return indicesSorted;
 
 }
 
@@ -87,7 +83,6 @@ CudaBVHBuildNode* CudaBVHBuilder::BuildTreeHierarchyHelper(unsigned int* dMorton
 	cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
 	BuildTreeHierarchy(nPrimitives, dMortonCodesSorted, dMortonIndicesSorted, dTree);
 	cudaFree(dMortonCodesSorted);
-	cudaFree(dMortonIndicesSorted);
 	return dTree;
 }
 
@@ -102,7 +97,11 @@ CudaBVHBuildNode* CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWit
 	return treeWithBoundingBoxes;
 }
 
-void CudaBVHBuilder::PermutePrimitivesAndFlattenTree(unsigned int* indicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives) {
+void CudaBVHBuilder::PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* treeWithBoundingBoxes, int nPrimitives) {
+	
+	unsigned int* indicesSorted = (unsigned int*) malloc(nPrimitives * sizeof(unsigned int));
+	cudaMemcpy(indicesSorted, dMortonIndicesSorted, nPrimitives * sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	cudaFree(dMortonIndicesSorted);
 	
 	applyPermutation(bvh.primitives, indicesSorted, nPrimitives);
 	bvh.nodes = AllocAligned<LinearBVHNode>(2 * nPrimitives - 1);
