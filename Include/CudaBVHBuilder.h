@@ -46,13 +46,16 @@ struct CudaBVHBuildNode {
 
 class CudaBVHBuilder : public BVHBuilder {
 public:
-	CudaBVHBuilder(BVH& bvh);
+	CudaBVHBuilder(BVH& bvh, bool sharedMemoryUsed = false);
 	~CudaBVHBuilder();
 
 	// Inherited via BVHBuilder
 	virtual void BuildBVH() override;
 
 private:
+	// If true, shared memory is used to compute bounding boxes
+	bool sharedMemoryUsed;
+
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
 

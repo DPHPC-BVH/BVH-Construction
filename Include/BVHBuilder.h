@@ -40,7 +40,8 @@ enum class BVHBuilderType
 {
     RecursiveBVHBuilder,
     LBVHBuilder,
-    CudaBVHBuilder
+    CudaBVHBuilder,
+	CudaBVHBuilderWithSharedMemory
 };
 
 class BVHBuilder {

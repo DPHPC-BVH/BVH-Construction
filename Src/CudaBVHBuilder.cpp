@@ -6,8 +6,8 @@
 NAMESPACE_DPHPC_BEGIN
 
 
-CudaBVHBuilder::CudaBVHBuilder(BVH& bvh) 
-	: BVHBuilder(bvh)
+CudaBVHBuilder::CudaBVHBuilder(BVH& bvh, bool sharedMemoryUsed) 
+	: BVHBuilder(bvh), sharedMemoryUsed(sharedMemoryUsed)
 {
 	// We only need to know each bounding box of the primitive to construct the BVH.
 	primitiveInfo.reserve(bvh.primitives.size());
@@ -88,7 +88,11 @@ CudaBVHBuildNode* CudaBVHBuilder::BuildTreeHierarchyHelper(unsigned int* dMorton
 
 void CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives) {
 	
-	ComputeBoundingBoxes(nPrimitives, dTree, dPrimitiveInfo);
+	if (sharedMemoryUsed == true) {
+		ComputeBoundingBoxesWithSharedMemory(nPrimitives, dTree, dPrimitiveInfo);
+	} else {
+		ComputeBoundingBoxes(nPrimitives, dTree, dPrimitiveInfo);
+	}
 	cudaFree(dPrimitiveInfo);
 }
 
