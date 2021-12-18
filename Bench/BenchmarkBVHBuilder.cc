@@ -50,7 +50,7 @@ BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 3)->Name("BM_RecursiveBVHBuilder/" + 
 /**
  * This function benchmarks the CudaBVHBuilder. Loading the mesh from the file is excluded.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilder(benchmark::State& state) {
+template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuilder(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
@@ -94,7 +94,7 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames
 /**
  * This function benchmarks the code that computes the bounding boxes in CudaBVHBuilder.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilderAlgorithmOnly(benchmark::State& state) {
+template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuilderAlgorithmOnly(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
@@ -174,7 +174,7 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 3)->Name("BM_CudaBVHBuilderAl
 /**
  * This function benchmarks the code to generate morton code in CudaBVHBuilder. Loading the mesh from the file is excluded.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benchmark::State& state) {
+template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuilder_GenerateMortonCodes(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
@@ -313,7 +313,7 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilde
 /**
  * This function benchmarks the code to build the three hierarchy in CudaBVHBuilder.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(benchmark::State& state) {
+template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuilder_BuildTreeHierarchy(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
@@ -388,7 +388,7 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBui
 /**
  * This function benchmarks the code that computes the bounding boxes in CudaBVHBuilder.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(benchmark::State& state) {
+template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];

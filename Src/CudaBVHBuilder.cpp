@@ -50,6 +50,21 @@ void CudaBVHBuilder::BuildBVH() {
 
 }
 
+void CudaBVHBuilder::SetStride(int stride) {
+	this->stride = stride;
+}
+
+void CudaBVHBuilder::SetOccupancy(float occupancy, int nPrimitives) {
+	// Query device properties
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, 0);
+	// For RTX 2060 (Turing arthitecture), multiProcessorCount=30, maxThreadsPerMultiProcessor=1024, warpSize=32
+	int maxWarps = prop.multiProcessorCount * (prop.maxThreadsPerMultiProcessor / prop.warpSize);
+	int nWarps = std::roundf(maxWarps * occupancy);
+	int nThreads = nWarps * prop.warpSize;
+	this->stride = (nPrimitives + (nThreads - 1)) / nThreads;
+}
+
 BVHPrimitiveInfoWithIndex* CudaBVHBuilder::PrepareDevicePrimitiveInfo(int nPrimitives) {
 	BVHPrimitiveInfoWithIndex* dPrimitiveInfo;
 	cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives);
@@ -61,7 +76,7 @@ void CudaBVHBuilder::GenerateMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimi
 		unsigned int** dMortonIndices, int nPrimitives) {
 	cudaMalloc(dMortonCodes, sizeof(unsigned int) * nPrimitives);
 	cudaMalloc(dMortonIndices, sizeof(unsigned int) * nPrimitives);
-	GenerateMortonCodes32(nPrimitives, dPrimitiveInfo, *dMortonCodes, *dMortonIndices);
+	GenerateMortonCodes32(nPrimitives, stride, dPrimitiveInfo, *dMortonCodes, *dMortonIndices);
 }
 
 void CudaBVHBuilder::SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
@@ -81,14 +96,14 @@ CudaBVHBuildNode* CudaBVHBuilder::BuildTreeHierarchyHelper(unsigned int* dMorton
 	
 	CudaBVHBuildNode* dTree;
 	cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
-	BuildTreeHierarchy(nPrimitives, dMortonCodesSorted, dMortonIndicesSorted, dTree);
+	BuildTreeHierarchy(nPrimitives, stride, dMortonCodesSorted, dMortonIndicesSorted, dTree);
 	cudaFree(dMortonCodesSorted);
 	return dTree;
 }
 
 void CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives) {
 	
-	ComputeBoundingBoxes(nPrimitives, dTree, dPrimitiveInfo);
+	ComputeBoundingBoxes(nPrimitives, stride, dTree, dPrimitiveInfo);
 	cudaFree(dPrimitiveInfo);
 }
 

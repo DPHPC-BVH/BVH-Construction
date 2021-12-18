@@ -52,6 +52,9 @@ public:
 	// Inherited via BVHBuilder
 	virtual void BuildBVH() override;
 
+	void SetStride(int stride);
+	void SetOccupancy(float occupancy, int nPrimitives);
+
 private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
@@ -70,7 +73,7 @@ private:
 
 	void PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* dTree, int nPrimitives);
 
-
+	int stride = 1;  // How many triangles that each thread process
 };
 
 

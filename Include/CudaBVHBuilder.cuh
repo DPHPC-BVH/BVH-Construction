@@ -6,10 +6,12 @@
 
 NAMESPACE_DPHPC_BEGIN
 
-void GenerateMortonCodes32(int nPrimitives, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+#define blockSize 256
+
+void GenerateMortonCodes32(int nPrimitives, int stride, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
         unsigned int* dMortonCodes, unsigned int* dIndices);
 
-__global__ void GenerateMortonCodes32Kernel(int nPrimitives, BVHPrimitiveInfoWithIndex* primitiveInfo,
+__global__ void GenerateMortonCodes32Kernel(int nPrimitives, int stride, BVHPrimitiveInfoWithIndex* primitiveInfo,
         unsigned int* dMortonCodes, unsigned int* indices);
 
 
@@ -34,18 +36,18 @@ __forceinline__ __device__ uint32_t GetMortonCode32(float x, float y, float z) {
     return (LeftShiftAndExpand32(1024 * z) << 2) | (LeftShiftAndExpand32(1024 * y) << 1) | LeftShiftAndExpand32(1024 * x);
 }
 
-void BuildTreeHierarchy(int nPrimitives, unsigned int* dMortonCodesSorted,
+void BuildTreeHierarchy(int nPrimitives, int stride, unsigned int* dMortonCodesSorted,
         unsigned int* dIndicesSorted, CudaBVHBuildNode* dTree);
 
-__global__ void BuildTreeHierarchyKernel(int nPrimitives, unsigned int* mortonCodesSorted,
+__global__ void BuildTreeHierarchyKernel(int nPrimitives, int stride, unsigned int* mortonCodesSorted,
         unsigned int* indicesSorted, CudaBVHBuildNode* tree);
 
 __device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int numberOfElements,
         int index1, int index2, unsigned int key1);
 
-void ComputeBoundingBoxes(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
+void ComputeBoundingBoxes(int nPrimitives, int stride, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
 
-__global__ void ComputeBoundingBoxesKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
+__global__ void ComputeBoundingBoxesKernel(int nPrimitives, int stride, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
 
 __device__ void BoundingBoxUnion(Bounds3f bIn1, Bounds3f bIn2, Bounds3f* bOut);
 
