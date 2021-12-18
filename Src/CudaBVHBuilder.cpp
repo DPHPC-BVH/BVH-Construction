@@ -50,26 +50,40 @@ void CudaBVHBuilder::BuildBVH() {
 
 }
 
-void CudaBVHBuilder::SetStride(int stride) {
-	this->stride = stride;
-}
+//void CudaBVHBuilder::SetStride(int stride) {
+//	this->stride = stride;
+//}
+//
+//void CudaBVHBuilder::SetOccupancy(float occupancy, int nPrimitives) {
+//	// Query device properties
+//	cudaDeviceProp prop;
+//	cudaGetDeviceProperties(&prop, 0);
+//	// For RTX 2060 (Turing arthitecture), multiProcessorCount=30, maxThreadsPerMultiProcessor=1024, warpSize=32
+//	int maxWarps = prop.multiProcessorCount * (prop.maxThreadsPerMultiProcessor / prop.warpSize);
+//	int nWarps = std::roundf(maxWarps * occupancy);
+//	int nThreads = nWarps * prop.warpSize;
+//	this->stride = (nPrimitives + (nThreads - 1)) / nThreads;
+//	//std::cout << "occupancy: " << occupancy * 100 << "stride: " << stride << std::endl;
+//}
 
-void CudaBVHBuilder::SetOccupancy(float occupancy, int nPrimitives) {
-	// Query device properties
-	cudaDeviceProp prop;
-	cudaGetDeviceProperties(&prop, 0);
-	// For RTX 2060 (Turing arthitecture), multiProcessorCount=30, maxThreadsPerMultiProcessor=1024, warpSize=32
-	int maxWarps = prop.multiProcessorCount * (prop.maxThreadsPerMultiProcessor / prop.warpSize);
-	int nWarps = std::roundf(maxWarps * occupancy);
-	int nThreads = nWarps * prop.warpSize;
-	this->stride = (nPrimitives + (nThreads - 1)) / nThreads;
-	//std::cout << "occupancy: " << occupancy * 100 << "stride: " << stride << std::endl;
+void CudaBVHBuilder::SetBlockNum(int blockNum) {
+	if (blockNum <= 0) {
+		return;
+	}
+	int nThreads = blockSize * blockNum;
+	stride = (nPrimitives + (nThreads - 1)) / nThreads;
+	gridSize = blockNum;
 }
 
 BVHPrimitiveInfoWithIndex* CudaBVHBuilder::PrepareDevicePrimitiveInfo(int nPrimitives) {
 	BVHPrimitiveInfoWithIndex* dPrimitiveInfo;
 	cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives);
 	cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives, cudaMemcpyHostToDevice);
+
+	this->nPrimitives = nPrimitives;
+	int nTasksPerBlock = blockSize * stride;
+	gridSize = (nPrimitives + (nTasksPerBlock - 1)) / nTasksPerBlock;
+
 	return dPrimitiveInfo;
 }
 
@@ -77,7 +91,7 @@ void CudaBVHBuilder::GenerateMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimi
 		unsigned int** dMortonIndices, int nPrimitives) {
 	cudaMalloc(dMortonCodes, sizeof(unsigned int) * nPrimitives);
 	cudaMalloc(dMortonIndices, sizeof(unsigned int) * nPrimitives);
-	GenerateMortonCodes32(nPrimitives, stride, dPrimitiveInfo, *dMortonCodes, *dMortonIndices);
+	GenerateMortonCodes32(nPrimitives, gridSize, stride, dPrimitiveInfo, *dMortonCodes, *dMortonIndices);
 }
 
 void CudaBVHBuilder::SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
@@ -97,14 +111,14 @@ CudaBVHBuildNode* CudaBVHBuilder::BuildTreeHierarchyHelper(unsigned int* dMorton
 	
 	CudaBVHBuildNode* dTree;
 	cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
-	BuildTreeHierarchy(nPrimitives, stride, dMortonCodesSorted, dMortonIndicesSorted, dTree);
+	BuildTreeHierarchy(nPrimitives, gridSize, stride, dMortonCodesSorted, dMortonIndicesSorted, dTree);
 	cudaFree(dMortonCodesSorted);
 	return dTree;
 }
 
 void CudaBVHBuilder::ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives) {
 	
-	ComputeBoundingBoxes(nPrimitives, stride, dTree, dPrimitiveInfo);
+	ComputeBoundingBoxes(nPrimitives, gridSize, stride, dTree, dPrimitiveInfo);
 	cudaFree(dPrimitiveInfo);
 }
 

@@ -7,11 +7,9 @@ NAMESPACE_DPHPC_BEGIN
 /**
  * Generate morton codes on GPU
  */
-void GenerateMortonCodes32(int nPrimitives, int stride, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+void GenerateMortonCodes32(int nPrimitives, int gridSize, int stride, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
         unsigned int* dMortonCodes, unsigned int* dIndices)
 {
-    int nTasksPerBlock = blockSize * stride;
-    int gridSize = (nPrimitives + (nTasksPerBlock - 1)) / blockSize;
     GenerateMortonCodes32Kernel<<<gridSize, blockSize>>>(nPrimitives, stride, dPrimitiveInfo, dMortonCodes, dIndices);
 }
 
@@ -41,11 +39,9 @@ __global__ void GenerateMortonCodes32Kernel(int nPrimitives, int stride, BVHPrim
 /**
  * Builds Tree hierarchy on GPU
  */
-void BuildTreeHierarchy(int nPrimitives, int stride, unsigned int* dMortonCodesSorted,
+void BuildTreeHierarchy(int nPrimitives, int gridSize, int stride, unsigned int* dMortonCodesSorted,
         unsigned int* dIndicesSorted, CudaBVHBuildNode* dTree)
 {
-    int nTasksPerBlock = blockSize * stride;
-    int gridSize = (nPrimitives-1 + (nTasksPerBlock - 1)) / blockSize;
     BuildTreeHierarchyKernel<<<gridSize, blockSize>>>(nPrimitives, stride, dMortonCodesSorted, dIndicesSorted, dTree);
 }
 
@@ -181,11 +177,8 @@ __device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int number
 /**
  * Computes bounding boxes in Tree hierarchy on GPU
  */
-void ComputeBoundingBoxes(int nPrimitives, int stride, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo) {
+void ComputeBoundingBoxes(int nPrimitives, int gridSize, int stride, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo) {
     
-    int nTasksPerBlock = blockSize * stride;
-    int gridSize = (nPrimitives + (nTasksPerBlock - 1)) / blockSize;
-
     int* dInteriorNodeCounter;
     cudaMalloc(&dInteriorNodeCounter, (nPrimitives - 1) * sizeof(int));
     cudaMemset(dInteriorNodeCounter, -1, (nPrimitives - 1) * sizeof(int));

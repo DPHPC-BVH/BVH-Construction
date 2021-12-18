@@ -6,9 +6,9 @@
 
 NAMESPACE_DPHPC_BEGIN
 
-#define blockSize 256
+#define blockSize 1024
 
-void GenerateMortonCodes32(int nPrimitives, int stride, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+void GenerateMortonCodes32(int nPrimitives, int gridSize, int stride, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
         unsigned int* dMortonCodes, unsigned int* dIndices);
 
 __global__ void GenerateMortonCodes32Kernel(int nPrimitives, int stride, BVHPrimitiveInfoWithIndex* primitiveInfo,
@@ -36,7 +36,7 @@ __forceinline__ __device__ uint32_t GetMortonCode32(float x, float y, float z) {
     return (LeftShiftAndExpand32(1024 * z) << 2) | (LeftShiftAndExpand32(1024 * y) << 1) | LeftShiftAndExpand32(1024 * x);
 }
 
-void BuildTreeHierarchy(int nPrimitives, int stride, unsigned int* dMortonCodesSorted,
+void BuildTreeHierarchy(int nPrimitives, int gridSize, int stride, unsigned int* dMortonCodesSorted,
         unsigned int* dIndicesSorted, CudaBVHBuildNode* dTree);
 
 __global__ void BuildTreeHierarchyKernel(int nPrimitives, int stride, unsigned int* mortonCodesSorted,
@@ -45,7 +45,7 @@ __global__ void BuildTreeHierarchyKernel(int nPrimitives, int stride, unsigned i
 __device__ int LongestCommonPrefix(unsigned int* sortedKeys, unsigned int numberOfElements,
         int index1, int index2, unsigned int key1);
 
-void ComputeBoundingBoxes(int nPrimitives, int stride, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
+void ComputeBoundingBoxes(int nPrimitives, int gridSize, int stride, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
 
 __global__ void ComputeBoundingBoxesKernel(int nPrimitives, int stride, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
 
