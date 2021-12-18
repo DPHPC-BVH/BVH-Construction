@@ -217,7 +217,7 @@ __global__ void ComputeBoundingBoxesKernel(int nPrimitives, int stride, CudaBVHB
             int lastVisitedThreadId = atomicExch(&interiorNodeCounter[currentIndex], i);
             if (lastVisitedThreadId == -1) {
                 // We are the first thread to visit the interior node, so we return
-                return;
+                break;
             }
 
             int leftIndex = tree[currentIndex].children[0];
