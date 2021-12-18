@@ -11,13 +11,13 @@
 
 NAMESPACE_DPHPC_BEGIN
 
-
 std::vector<std::string> SceneNames = {
-    "conference",
-    "fairyforest",
-    "sibenik",
-    "sanmiguel"
+	"conference",
+	"fairyforest",
+	"sibenik",
+	"sanmiguel"
 };
+
 
 /**
  * This function benchmarks the RecursiveBVHBuilder. Loading the mesh from the file is excluded.
@@ -42,10 +42,10 @@ template <int SceneIndex> static void BM_RecursiveBVHBuilder(benchmark::State& s
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 0)->Name("BM_RecursiveBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false);
-BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 1)->Name("BM_RecursiveBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false);
-BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 2)->Name("BM_RecursiveBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false);
-BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 3)->Name("BM_RecursiveBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false);
+//BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 0)->Name("BM_RecursiveBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false);
+//BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 1)->Name("BM_RecursiveBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false);
+//BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 2)->Name("BM_RecursiveBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false);
+//BENCHMARK_TEMPLATE(BM_RecursiveBVHBuilder, 3)->Name("BM_RecursiveBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false);
 
 /**
  * This function benchmarks the CudaBVHBuilder. Loading the mesh from the file is excluded.
@@ -86,10 +86,11 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 0)->Name("BM_CudaBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 1)->Name("BM_CudaBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 2)->Name("BM_CudaBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 0)->Name("BM_CudaBVHBuilder/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 1)->Name("BM_CudaBVHBuilder/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 2)->Name("BM_CudaBVHBuilder/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder, 3)->Name("BM_CudaBVHBuilder/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+
 
 /**
  * This function benchmarks the code that computes the bounding boxes in CudaBVHBuilder.
@@ -120,6 +121,7 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
         const unsigned int nPrimitives = builder->primitiveInfo.size();
+        builder->SetOccupancy(OccupancyPercent / 100.0f, nPrimitives);
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
 
         // Additional GPU Timer
@@ -163,13 +165,22 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 1)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 2)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 3)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 1)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 2)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 3)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-
-
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 10)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/10")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 20)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/20")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 30)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/30")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 40)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/40")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 50)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/50")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 60)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/60")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 70)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/70")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 80)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/80")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 90)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/90")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 0, 100)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[3] + "/100")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 /**
  * This function benchmarks the code to generate morton code in CudaBVHBuilder. Loading the mesh from the file is excluded.
@@ -200,6 +211,7 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
         const unsigned int nPrimitives = builder->primitiveInfo.size();
+        builder->SetOccupancy(OccupancyPercent / 100.0f, nPrimitives);
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
 
         // Additional GPU Timer
@@ -232,11 +244,11 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
-
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 0)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 1)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 2)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 3)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 0)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 1)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 2)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 3)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
 /**
  * This function benchmarks the code to sort morton code in CudaBVHBuilder.
@@ -304,11 +316,11 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
-
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 0)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 1)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 2)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 0)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 1)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 2)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
 /**
  * This function benchmarks the code to build the three hierarchy in CudaBVHBuilder.
@@ -339,6 +351,7 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
         const unsigned int nPrimitives = builder->primitiveInfo.size();
+        builder->SetOccupancy(OccupancyPercent / 100.0f, nPrimitives);
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
         
         // 1. Compute Morton Codes
@@ -378,11 +391,11 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
-
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 0)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 1)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 2)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 0)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 1)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 2)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
 
 /**
@@ -414,6 +427,7 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
         const unsigned int nPrimitives = builder->primitiveInfo.size();
+        builder->SetOccupancy(OccupancyPercent / 100.0f, nPrimitives);
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
         
         // 1. Compute Morton Codes
@@ -455,11 +469,11 @@ template <int SceneIndex, int OccupancyPercent = 100> static void BM_CudaBVHBuil
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
-
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
 
 /**
@@ -534,12 +548,39 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
     state.counters["primitives/s"] = benchmark::Counter(scene->numTriangles, benchmark::Counter::kIsRate);
     delete scene;
 }
+//
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 0)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 1)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 2)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 3)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 0)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 1)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 2)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 3)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
+#define IMPLEMENT_SCALABILITY_TEST(SceneIndex, func) \
+    BENCHMARK_TEMPLATE(func, 0, 5)->Name(#func + SceneNames[SceneIndex] + "/5")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 10)->Name(#func + SceneNames[SceneIndex] + "/10")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 15)->Name(#func + SceneNames[SceneIndex] + "/15")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 20)->Name(#func + SceneNames[SceneIndex] + "/20")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 25)->Name(#func + SceneNames[SceneIndex] + "/25")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 30)->Name(#func + SceneNames[SceneIndex] + "/30")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 35)->Name(#func + SceneNames[SceneIndex] + "/35")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 40)->Name(#func + SceneNames[SceneIndex] + "/40")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 45)->Name(#func + SceneNames[SceneIndex] + "/45")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 50)->Name(#func + SceneNames[SceneIndex] + "/50")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 55)->Name(#func + SceneNames[SceneIndex] + "/55")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 60)->Name(#func + SceneNames[SceneIndex] + "/60")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 65)->Name(#func + SceneNames[SceneIndex] + "/65")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 70)->Name(#func + SceneNames[SceneIndex] + "/70")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 75)->Name(#func + SceneNames[SceneIndex] + "/75")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 80)->Name(#func + SceneNames[SceneIndex] + "/80")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 85)->Name(#func + SceneNames[SceneIndex] + "/85")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 90)->Name(#func + SceneNames[SceneIndex] + "/90")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 95)->Name(#func + SceneNames[SceneIndex] + "/95")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	BENCHMARK_TEMPLATE(func, 0, 100)->Name(#func + SceneNames[SceneIndex] + "/100")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	//BENCHMARK_TEMPLATE(func, 0, 200)->Name(#func + SceneNames[SceneIndex] + "/200")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	//BENCHMARK_TEMPLATE(func, 0, 500)->Name(#func + SceneNames[SceneIndex] + "/500")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+	//BENCHMARK_TEMPLATE(func, 0, 1000)->Name(#func + SceneNames[SceneIndex] + "/1000")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); 
+
+IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilderAlgorithmOnly)
 
 BENCHMARK_MAIN();
 

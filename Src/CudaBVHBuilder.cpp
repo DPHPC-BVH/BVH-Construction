@@ -63,6 +63,7 @@ void CudaBVHBuilder::SetOccupancy(float occupancy, int nPrimitives) {
 	int nWarps = std::roundf(maxWarps * occupancy);
 	int nThreads = nWarps * prop.warpSize;
 	this->stride = (nPrimitives + (nThreads - 1)) / nThreads;
+	//std::cout << "occupancy: " << occupancy * 100 << "stride: " << stride << std::endl;
 }
 
 BVHPrimitiveInfoWithIndex* CudaBVHBuilder::PrepareDevicePrimitiveInfo(int nPrimitives) {
