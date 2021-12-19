@@ -1,10 +1,9 @@
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 import os
 
-from util import shapiro_wilk_test
+from util import shapiro_wilk_test, read_csv
 
 
 def add_plot_distribution_subparser(parser):
@@ -13,10 +12,12 @@ def add_plot_distribution_subparser(parser):
     subparser.add_argument('--without-labels', action='store_true', help='Hides the labels')
     subparser.add_argument('--without-additional-info', action='store_true', help='Hides additional information under the plot')
     subparser.add_argument('--unit', choices=['s', 'ms', 'us', 'ns'], default='us', help='The time unit, used for the histogram')
-    subparser.add_argument('--skip-first-n-iterations', type=int, help='The number of first iterations to skip (used to skip warm-up iterations)')
+    subparser.add_argument('--skip-first-n-iterations', type=int, default=0, help='The number of first iterations to skip (used to skip warm-up iterations)')
+    subparser.add_argument('--out', type=str, default='plot.pdf', help='specifies the output file')
 
 
-def plot_distribution(file, without_labels=False, without_additional_info=False, unit='us', skip_first_n_iterations=0, exponent = None):
+
+def plot_distribution(file, without_labels, without_additional_info, unit, skip_first_n_iterations, out, exponent = None):
     
     # Read in data and convert to unit
     df = read_csv(file)
@@ -88,8 +89,7 @@ def plot_distribution(file, without_labels=False, without_additional_info=False,
         plt.subplots_adjust(bottom=0.2)
 
     # Save Plot
-    pre, _ = os.path.splitext(file)
-    plt.savefig(pre + ".pdf")
+    plt.savefig(out, bbox_inches="tight")
 
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -122,9 +122,6 @@ def draw_vertical_line(value, label, linestyle, color, without_labels=False):
     if not without_labels:
         plt.text(value, max_ylim * 1.02, label, fontsize='small', horizontalalignment='center', verticalalignment='center', color=color)
         plt.text(value + 0.15, max_ylim*0.85, '{:.2f}'.format(value), rotation=90, fontsize='small')
-
-def read_csv(path):
-    return pd.read_csv(path, header=9)
 
 def convert_ns_to_format(time, unit, exponent=1):
     if unit == 'ns':
