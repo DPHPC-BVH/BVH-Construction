@@ -59,3 +59,12 @@ For advanced use look at
 ```bash
 ./build/Bench/bench_dphp_bvh --help
 ```
+
+## Collect benchmark data and make plots
+
+First install the python dependencies. For instance 
+```
+pip install -r requirements.txt
+```
+
+Then compile the project and execute the scripts `collect_benchmark_data.sh` and `make_all_plots.sh`
