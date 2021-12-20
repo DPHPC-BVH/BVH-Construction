@@ -39,6 +39,8 @@ do
         bash ./submit.sh "./build/Bench/bench_dphp_bvh --benchmark_repetitions=${RUNS} --benchmark_counters_tabular=true --benchmark_out_format=csv --benchmark_out=${BENCH_OUT_DIR}${NAME}.csv --benchmark_filter=\"${REGEX}\""
     else
         ./build/Bench/bench_dphp_bvh --benchmark_repetitions=${RUNS} --benchmark_counters_tabular=true --benchmark_out_format=csv --benchmark_out=${BENCH_OUT_DIR}${NAME}.csv --benchmark_filter="${REGEX}"
+        # To run on Windows:
+        #./Build/Bench/Release/bench_dphp_bvh.exe --benchmark_repetitions=${RUNS} --benchmark_counters_tabular=true --benchmark_out_format=csv --benchmark_out=${BENCH_OUT_DIR}${NAME}.csv --benchmark_filter="${REGEX}"
     fi
 done
 
