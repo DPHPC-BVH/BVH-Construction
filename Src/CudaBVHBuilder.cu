@@ -232,6 +232,88 @@ __global__ void ComputeBoundingBoxesKernel(int nPrimitives, CudaBVHBuildNode* tr
     }
 }
 
+void ComputeBoundingBoxesWithSharedMemory(int nPrimitives, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo) {
+    ComputeBoundingBoxesWithSharedMemory<256>(nPrimitives, dTree, dPrimitiveInfo);
+}
+
+void ComputeBoundingBoxesWithSharedMemoryWrapper(int nPrimitives, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+        dim3 gridSize, dim3 blockSize, size_t sharedMemorySize) {
+    
+    cudaFuncSetCacheConfig(ComputeBoundingBoxesWithSharedMemoryKernel, cudaFuncCachePreferShared);
+
+    int* dInteriorNodeCounter;
+    cudaMalloc(&dInteriorNodeCounter, (nPrimitives - 1) * sizeof(int));
+    cudaMemset(dInteriorNodeCounter, -1, (nPrimitives - 1) * sizeof(int));
+
+    ComputeBoundingBoxesWithSharedMemoryKernel<<<gridSize, blockSize, sharedMemorySize>>>(nPrimitives, dTree, dPrimitiveInfo, dInteriorNodeCounter);
+
+    cudaFree(dInteriorNodeCounter);
+}
+
+
+/**
+  * Kernel to compute the bounding boxes and makes use of shared memory
+  */
+__global__ void ComputeBoundingBoxesWithSharedMemoryKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter) {
+
+    const int i = threadIdx.x + blockIdx.x * blockDim.x;
+    const int firstThreadOfTheBlock = blockIdx.x * blockDim.x;
+    const int lastThreadOfTheBlock = (blockDim.x - 1) + blockIdx.x * blockDim.x;
+
+    extern __shared__ Bounds3f sharedBoundsCache[];
+
+    // Do nothing if we have more threads than required
+    if (i >= nPrimitives)
+    {
+        return;
+    }
+
+    const int index = i + (nPrimitives - 1);
+
+    Bounds3f currentBounds = primitiveInfo[tree[index].dataIdx].bounds;
+    sharedBoundsCache[threadIdx.x] = currentBounds;
+    tree[index].bounds = currentBounds;
+
+    __syncthreads();
+
+    int previousIndex = index;
+    int currentIndex = tree[index].parent;
+    while (currentIndex != -1) {
+
+        int lastVisitedThreadId = atomicExch(&interiorNodeCounter[currentIndex], i);
+        if (lastVisitedThreadId == -1) {
+            // We are the first thread to visit the interior node, so we return
+            return;
+        }
+
+        Bounds3f* childBounds;
+        // Check if both children were processed by threads of the same block, so we can use cached values and avoid global memory
+        if (lastVisitedThreadId >= firstThreadOfTheBlock && lastVisitedThreadId <= lastThreadOfTheBlock) {
+            childBounds = &sharedBoundsCache[lastVisitedThreadId - firstThreadOfTheBlock];
+
+        } else {
+            int childIndex = tree[currentIndex].children[0];
+            if (childIndex == previousIndex) {
+                // we need the right child
+                childIndex = tree[currentIndex].children[1];
+            }
+
+            childBounds = &tree[childIndex].bounds;
+
+        }
+
+
+        BoundingBoxUnion(*childBounds, currentBounds, &currentBounds);
+
+        sharedBoundsCache[threadIdx.x] = currentBounds;
+        tree[currentIndex].bounds = currentBounds;
+
+        previousIndex = currentIndex;
+
+        currentIndex = tree[currentIndex].parent;
+    }
+}
+
 __device__ void BoundingBoxUnion(Bounds3f bIn1, Bounds3f bIn2, Bounds3f* bOut) {
 
     bOut->pMin.x = min(bIn1.pMin.x, bIn2.pMin.x);

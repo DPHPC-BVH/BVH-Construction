@@ -17,6 +17,8 @@ BVHBuilder* BVHBuilder::MakeBVHBuilder(BVHBuilderType type, BVH* bvh) {
 			return new RecursiveBVHBuilder(*bvh);
 		case BVHBuilderType::CudaBVHBuilder:
 			return new CudaBVHBuilder(*bvh);
+		case BVHBuilderType::CudaBVHBuilderWithSharedMemory:
+			return new CudaBVHBuilder(*bvh, true);
 		default:
 			throw "Scene::BuildBVH: Invalid BVHBuilderType";
 	}
