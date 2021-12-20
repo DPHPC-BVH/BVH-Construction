@@ -30,7 +30,7 @@ TEST(CudaBVHBuilderTest, getMortonCode32) {
 
 TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
 
-  unsigned int nPrimitives = 8;
+  constexpr unsigned int nPrimitives = 8;
   unsigned int mortonCodeSorted[nPrimitives] = {
       0b00000000000000000000000000000001,
       0b00000000000000000000000000000010,
@@ -104,7 +104,7 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
 
 TEST(CudaBVHBuilderTest, ComputeBoundingBoxes) {
 
-  unsigned int nPrimitives = 8;
+  constexpr unsigned int nPrimitives = 8;
   unsigned int mortonCodeSorted[nPrimitives] = {
       0b00000000000000000000000000000001,
       0b00000000000000000000000000000010,
@@ -190,7 +190,7 @@ TEST(CudaBVHBuilderTest, ComputeBoundingBoxes) {
 
 TEST(CudaBVHBuilderTest, ComputeBoundingBoxesWithSharedMemory) {
 
-  unsigned int nPrimitives = 8;
+  constexpr unsigned int nPrimitives = 8;
   unsigned int mortonCodeSorted[nPrimitives] = {
       0b00000000000000000000000000000001,
       0b00000000000000000000000000000010,
