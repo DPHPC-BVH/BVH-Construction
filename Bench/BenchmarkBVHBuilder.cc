@@ -609,10 +609,33 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
 	BENCHMARK_TEMPLATE(func, 0, -1)->Name(#func + SceneNames[SceneIndex] + "/-1")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
 
 
-//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_GenerateMortonCodes)
-//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_BuildTreeHierarchy)
+IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_GenerateMortonCodes)
+IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_BuildTreeHierarchy)
+IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilderAlgorithmOnly)
+
+IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_GenerateMortonCodes)
+IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_BuildTreeHierarchy)
+IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilderAlgorithmOnly)
+
+IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_GenerateMortonCodes)
+IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_BuildTreeHierarchy)
+IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilderAlgorithmOnly)
+
+IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_GenerateMortonCodes)
+IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_BuildTreeHierarchy)
 IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_ComputeBoundingBoxes)
-//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilderAlgorithmOnly)
+IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilderAlgorithmOnly)
+
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_GenerateMortonCodes, 3)->Name("BM_CudaBVHBuilder_GenerateMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_SortMortonCodes, 3)->Name("BM_CudaBVHBuilder_SortMortonCodes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBuilder_BuildTreeHierarchy/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+//BENCHMARK_TEMPLATE(BM_CudaBVHBuilderAlgorithmOnly, 3)->Name("BM_CudaBVHBuilderAlgorithmOnly/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
+
+
 
 BENCHMARK_MAIN();
 
