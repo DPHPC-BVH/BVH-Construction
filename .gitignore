@@ -407,3 +407,4 @@ _deps
 # Project related excludes
 Scenes/*
 build/
+out/*
