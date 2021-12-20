@@ -388,7 +388,7 @@ BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_BuildTreeHierarchy, 3)->Name("BM_CudaBVHBui
 /**
  * This function benchmarks the code that computes the bounding boxes in CudaBVHBuilder.
  */
-template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(benchmark::State& state) {
+template <int SceneIndex, bool UseSharedMemory> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(benchmark::State& state) {
     
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
@@ -411,7 +411,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
 		    pTriangles.push_back(std::make_shared<Triangle>(scene->triangles[i]));
 	    }
         scene->bvh = BVH(pTriangles);
-        CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
+        CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh, UseSharedMemory);
 
         const unsigned int nPrimitives = builder->primitiveInfo.size();
 	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
@@ -456,10 +456,15 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_ComputeBoundingBoxes(ben
     delete scene;
 }
 
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
-BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0, false)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1, false)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2, false)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3, false)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxes/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 0, true)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxesWithSharedMemory/" + SceneNames[0])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 1, true)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxesWithSharedMemory/" + SceneNames[1])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 2, true)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxesWithSharedMemory/" + SceneNames[2])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
+BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_ComputeBoundingBoxes, 3, true)->Name("BM_CudaBVHBuilder_ComputeBoundingBoxesWithSharedMemory/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime();
 
 
 /**
