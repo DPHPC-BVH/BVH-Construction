@@ -8,7 +8,7 @@ def add_plot_stages_subparser(parser):
     subparser.add_argument('files', type=str, nargs='+', help='The path to the csv file containing the measurements')
     subparser.add_argument('--strategy', choices=['mean', 'median'], default='median', help='The strategy used to summarize the runs')
     subparser.add_argument('--absolute', action='store_true', help='shows absolute values instead precentage')
-    subparser.add_argument('--out', type=str, default='plot_stages.pdf', help='specifies the output file')
+    subparser.add_argument('--out', type=str, default='plot.pdf', help='specifies the output file')
     subparser.add_argument('--skip-first-n-iterations', type=int, default=0, help='The number of first iterations to skip (used to skip warm-up iterations)')
 
 
