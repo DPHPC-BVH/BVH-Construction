@@ -11,11 +11,17 @@ def shapiro_wilk_test(data, alpha=0.05, verbose=False):
         print("--> WARNING: Data does not look Gaussian!")
     return p > alpha 
 
-def median_confidence_interval_95(data):
+def median_confidence_interval_95(data, confidence=0.95):
+    assert confidence > 0 and confidence < 1
+    # Sort
     sorted_data = np.sort(data)
+    
+    # Compute high/low according to J.-Y. L. Boudec. Performance Evaluation of Computer and Communication Systems. EPFL Press, 2011.
     n = sorted_data.size
-    low = math.floor((n-1.96*np.sqrt(n))/2)
-    high = math.ceil(1+(n+1.96*np.sqrt(n))/2)
+    alpha = 1 - confidence
+    z_a_2 = stats.norm.ppf(1 - alpha / 2)
+    low = math.floor((n-z_a_2*np.sqrt(n))/2)
+    high = math.ceil(1+(n+z_a_2*np.sqrt(n))/2)
 
     return np.median(data), sorted_data[low], sorted_data[high]
 
