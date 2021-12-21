@@ -78,7 +78,7 @@ void CudaBVHBuilder::SetBlockNum(int blockNum) {
 
 void CudaBVHBuilder::GenerateMortonCodesHelper() {
 
-	GenerateMortonCodes32(nPrimitives, dPrimitiveInfo, dMortonCodes, dMortonIndices);
+	GenerateMortonCodes32(nPrimitives, gridSize, stride, dPrimitiveInfo, dMortonCodes, dMortonIndices);
 }
 
 void CudaBVHBuilder::SortMortonCodesHelper() {

@@ -57,12 +57,7 @@ public:
 	void SetBlockNum(int blockNum);
 
 private:
-	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
-	int nPrimitives = 0;
-
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
-
-
 
 
 	void GenerateMortonCodesHelper();
@@ -118,6 +113,7 @@ private:
 	int stride = 1;  // How many triangles that each thread process
 	int nPrimitives = 0;
 	int gridSize = -1;  // 
+	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
 };
 
 
