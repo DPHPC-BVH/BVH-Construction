@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from util import read_csv, mean_confidence_interval, median_confidence_interval_95
+from util import read_csv, mean_confidence_interval, median_confidence_interval_95, convert_ns_to_format
 
 def add_plot_series_subparser(parser):
     subparser = parser.add_parser('series', help='')
@@ -8,12 +8,13 @@ def add_plot_series_subparser(parser):
     subparser.add_argument('--series-labels', type=str, nargs='+', default=['Ours'])
     subparser.add_argument('--baseline', type=str, default=None, help='The path to the optix baseline')
     subparser.add_argument('--strategy', choices=['mean', 'median'], default='median', help='The strategy used to summarize the runs')
+    subparser.add_argument('--unit', choices=['s', 'ms', 'us', 'ns'], default='ms', help='The time unit, used for the histogram')
     subparser.add_argument('--with-ci', action='store_true', help='Display CI intervals')
     subparser.add_argument('--out', type=str, default='plot.pdf', help='specifies the output file')
     subparser.add_argument('--skip-first-n-iterations', type=int, default=0, help='The number of first iterations to skip (used to skip warm-up iterations)')
 
 
-def plot_series(files, series_labels, baseline, strategy, skip_first_n_iterations, with_ci, out):
+def plot_series(files, series_labels, baseline, strategy, unit, skip_first_n_iterations, with_ci, out):
 
     # read in data
     data_frames = [read_csv(file) for file in files]
@@ -21,9 +22,11 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
     # pick single iterations and skip first n iterations
     data_frames = [df[df['iterations'] == 1][skip_first_n_iterations:] for df in data_frames]
 
+    # Check unit
+    assert np.all(np.array([df['time_unit'] == 'ns' for df in data_frames]))
+
     # compute medians of each stage for all scenes
-    #data = [np.median(df['real_time']) if strategy == 'median' else np.mean(df['real_time']) for df in data_frames]
-    data = [df['real_time'] for df in data_frames]
+    data = [convert_ns_to_format(df['real_time'], unit) for df in data_frames]
 
     # Arrange data
     barplot_data = {}
@@ -38,7 +41,8 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
         baseline_data_dict = read_in_baseline(baseline)
         barplot_data['Baseline'] = []
         for name in scene_names:
-            barplot_data['Baseline'].append(baseline_data_dict[name][skip_first_n_iterations:])
+            data_in_unit = convert_ns_to_format(baseline_data_dict[name][skip_first_n_iterations:], unit)
+            barplot_data['Baseline'].append(data_in_unit)
     
     # compute label locations and bar offsets
     x = np.arange(len(scene_names))
@@ -55,7 +59,7 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
             yerr = np.transpose([[mid - lower, upper - mid] for (mid, lower, upper) in (median_confidence_interval_95(x) if strategy == 'median' else mean_confidence_interval(x) for x in barplot_data[key])])
         ax.bar(x + offsets[i % n_keys], data, yerr=yerr, width=width, label=key)
 
-    ax.set_ylabel('Execution time (ns)')
+    ax.set_ylabel('Execution time ({})'.format(unit))
     ax.set_xlabel('Scene')
     ax.set_title('Execution time for different scenes')
     plt.xticks(x, scene_names)

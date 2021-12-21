@@ -32,6 +32,18 @@ def mean_confidence_interval(data, confidence=0.95):
     lower, upper = stats.t.interval(confidence, n-1, loc=m, scale=se)
     return m, lower, upper
 
+def convert_ns_to_format(time, unit):
+    if unit == 'ns':
+        return time
+    elif unit == 'us':
+        return time / 1e3 
+    elif unit == 'ms':
+        return time / 1e6
+    elif unit == 's':
+        return time / 1e9
+    else:
+        raise Exception("Illegal output format")
+
 def read_csv(path):
     # Find start of header
     with open(path, 'r') as f:

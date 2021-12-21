@@ -1,24 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from util import shapiro_wilk_test, read_csv
+from util import shapiro_wilk_test, read_csv, convert_ns_to_format
 
 def add_plot_stages_subparser(parser):
     subparser = parser.add_parser('stages', help='')
     subparser.add_argument('files', type=str, nargs='+', help='The path to the csv file containing the measurements')
     subparser.add_argument('--strategy', choices=['mean', 'median'], default='median', help='The strategy used to summarize the runs')
+    subparser.add_argument('--unit', choices=['s', 'ms', 'us', 'ns'], default='ms', help='The time unit, used for the histogram')
     subparser.add_argument('--absolute', action='store_true', help='shows absolute values instead precentage')
     subparser.add_argument('--out', type=str, default='plot.pdf', help='specifies the output file')
     subparser.add_argument('--skip-first-n-iterations', type=int, default=0, help='The number of first iterations to skip (used to skip warm-up iterations)')
 
 
-def plot_stages(files, strategy, absolute, skip_first_n_iterations, out):
+def plot_stages(files, strategy, unit, absolute, skip_first_n_iterations, out):
 
     # read in data
     data_frames = [read_csv(file) for file in files]
 
     # pick single iterations and skip first n iterations
     data_frames = [df[df['iterations'] == 1][skip_first_n_iterations:] for df in data_frames]
+
+     # Check unit
+    assert np.all(np.array([df['time_unit'] == 'ns' for df in data_frames]))
 
     # compute medians of each stage for all scenes
     data_frames = [df.groupby(['name']).median() if strategy == 'median' else df.groupby(['name']).mean() for df in data_frames]
@@ -45,6 +49,7 @@ def plot_stages(files, strategy, absolute, skip_first_n_iterations, out):
         # get barplot data
         barplot_data.append(df['real_time'].to_numpy())
 
+    barplot_data = convert_ns_to_format(np.array(barplot_data), unit)
     if not absolute: 
         barplot_data = barplot_data / np.sum(barplot_data, axis=1)[:, None]
     barplot_data = np.transpose(barplot_data)
@@ -59,7 +64,7 @@ def plot_stages(files, strategy, absolute, skip_first_n_iterations, out):
             ax.bar(scene_names, barplot_data[i], 0.5, barplot_data_cum_sum[i-1],label=stage_names[i])
 
 
-    ax.set_ylabel('Execution time shares' if not absolute else 'Execution time (ns)')
+    ax.set_ylabel('Execution time shares' if not absolute else 'Execution time ({})'.format(unit))
     ax.set_xlabel('Scenes')
     ax.set_title('Share of duration for all stages')
     plt.legend(bbox_to_anchor=(1.01,0.5), loc="center left")

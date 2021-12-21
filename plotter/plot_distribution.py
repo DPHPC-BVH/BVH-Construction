@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from util import shapiro_wilk_test, read_csv, mean_confidence_interval, median_confidence_interval_95
+from util import shapiro_wilk_test, read_csv, mean_confidence_interval, median_confidence_interval_95, convert_ns_to_format
 
 
 def add_plot_distribution_subparser(parser):
