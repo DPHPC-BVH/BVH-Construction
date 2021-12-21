@@ -27,11 +27,12 @@ template <int SceneIndex> static void BM_RecursiveBVHBuilder(benchmark::State& s
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	scene->LoadMeshFromFile(ScenePath);
 
     for (auto _ : state) {
         state.PauseTiming();
-        scene = new Scene();
-        scene->LoadMeshFromFile(ScenePath);
+
         state.ResumeTiming();
 
         scene->BuildBVH(BVHBuilderType::RecursiveBVHBuilder);
@@ -55,6 +56,8 @@ template <int SceneIndex> static void BM_CudaBVHBuilder(benchmark::State& state)
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -62,8 +65,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder(benchmark::State& state)
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        scene->LoadMeshFromFile(ScenePath);
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -99,6 +100,9 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilderAlgori
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -106,9 +110,6 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilderAlgori
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
 
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
@@ -176,6 +177,9 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Gener
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -183,9 +187,6 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Gener
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
 
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
@@ -238,6 +239,9 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -245,9 +249,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
 
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
@@ -302,6 +303,9 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Build
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -309,9 +313,6 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Build
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
 
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
@@ -371,6 +372,9 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Compu
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
 
     // WarmUp GPU
     WarmUpGPU();
@@ -378,9 +382,6 @@ template <int SceneIndex, int blockNum = -1> static void BM_CudaBVHBuilder_Compu
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
 
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
@@ -448,17 +449,15 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
     Scene* scene;
     const std::string SceneName = SceneNames[SceneIndex];
     const std::string ScenePath = "Scenes/" + SceneName + "/" + SceneName + ".obj";
-
+	scene = new Scene();
+	// Load mesh from file
+	scene->LoadMeshFromFile(ScenePath);
     // WarmUp GPU
     WarmUpGPU();
 
     for (auto _ : state) {
         
         state.PauseTiming();
-        scene = new Scene();
-        // Load mesh from file
-        scene->LoadMeshFromFile(ScenePath);
-
         // Prepare data for BVH construction
         std::vector<std::shared_ptr<Primitive>> pTriangles;
 	    pTriangles.reserve(scene->numTriangles);
