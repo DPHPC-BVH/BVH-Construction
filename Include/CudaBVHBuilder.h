@@ -58,21 +58,62 @@ public:
 
 private:
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
+	int nPrimitives = 0;
+
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
 
-	BVHPrimitiveInfoWithIndex* PrepareDevicePrimitiveInfo(int nPrimitives);
 
-	void GenerateMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int** dMortonCodes,
-			unsigned int** dMortonIndices, int nPrimitives);
 
-	void SortMortonCodesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, unsigned int* dMortonCodes,
-			unsigned int* dMortonIndices, unsigned int** dMortonCodesSorted, unsigned int** dMortonIndicesSorted, int nPrimitives);
+
+	void GenerateMortonCodesHelper();
+
+	void SortMortonCodesHelper();
 	
-	CudaBVHBuildNode* BuildTreeHierarchyHelper(unsigned int* dMortonCodesSorted, unsigned int* dMortonIndicesSorted, int nPrimitives);
+	void  BuildTreeHierarchyHelper();
 
-	void ComputeBoundingBoxesHelper(BVHPrimitiveInfoWithIndex* dPrimitiveInfo, CudaBVHBuildNode* dTree, int nPrimitives);
+	void ComputeBoundingBoxesHelper();
 
-	void PermutePrimitivesAndFlattenTree(unsigned int* dMortonIndicesSorted, CudaBVHBuildNode* dTree, int nPrimitives);
+	void PermutePrimitivesAndFlattenTree();
+
+	// Buffers used during construction. Freed after construction.
+	BVHPrimitiveInfoWithIndex* dPrimitiveInfo = nullptr;
+	unsigned int* dMortonCodes = nullptr;
+	unsigned int* dMortonIndices = nullptr;
+	unsigned int* dMortonCodesSorted = nullptr;
+	unsigned int* dMortonIndicesSorted = nullptr;
+	CudaBVHBuildNode* dTree = nullptr;
+
+
+
+	void AllocAuxBuffers() {
+		// For BVH construction we only need the bounding boxes and the centroids of the primitive
+		cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives);
+		cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives, cudaMemcpyHostToDevice);
+		
+		cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+		cudaMalloc(&dMortonIndices, sizeof(unsigned int) * nPrimitives);
+
+		cudaMalloc(&dMortonCodesSorted, sizeof(unsigned int) * nPrimitives);
+		cudaMalloc(&dMortonIndicesSorted, sizeof(unsigned int) * nPrimitives);
+
+		cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
+		
+	}
+
+	static void inline safeFree(void* devPtr) {
+		if(devPtr) {
+			cudaFree(devPtr);
+			devPtr = nullptr;
+		} 
+	}
+	void FreeAuxBuffers() {
+		safeFree(dPrimitiveInfo);
+		safeFree(dMortonCodes);
+		safeFree(dMortonIndices);
+		safeFree(dMortonCodesSorted);
+		safeFree(dMortonIndicesSorted);
+		safeFree(dTree);
+	}
 
 	int stride = 1;  // How many triangles that each thread process
 	int nPrimitives = 0;
