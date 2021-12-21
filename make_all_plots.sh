@@ -34,8 +34,8 @@ python3 ./plotter/plot.py stages ${BENCH_OUT_DIR}sibenik_stages.csv ${BENCH_OUT_
 python3 ./plotter/plot.py stages ${BENCH_OUT_DIR}sibenik_stages.csv ${BENCH_OUT_DIR}fairyforest_stages.csv ${BENCH_OUT_DIR}conference_stages.csv ${BENCH_OUT_DIR}sanmiguel_stages.csv --skip-first-n-iterations=${WARMUPS} --strategy=mean --absolute --out=${PLOTS_OUT_DIR}plot_stages_mean_absolute.pdf
 
 # Create plots with optix baseline
-python3 ./plotter/plot.py series ${BENCH_OUT_DIR}sibenik.csv ${BENCH_OUT_DIR}fairyforest.csv ${BENCH_OUT_DIR}conference.csv ${BENCH_OUT_DIR}sanmiguel.csv --baseline=plotter/optix_construction_baseline.txt --out=${PLOTS_OUT_DIR}baseline_comparison.pdf
+python3 ./plotter/plot.py series ${BENCH_OUT_DIR}sibenik.csv ${BENCH_OUT_DIR}fairyforest.csv ${BENCH_OUT_DIR}conference.csv ${BENCH_OUT_DIR}sanmiguel.csv --baseline=plotter/optix_construction_baseline.txt --skip-first-n-iterations=${WARMUPS} --out=${PLOTS_OUT_DIR}baseline_comparison.pdf
 
 # Create shared memory comparison plot
-python3 ./plotter/plot.py series ${BENCH_OUT_DIR}sibenik_bounding_boxes.csv ${BENCH_OUT_DIR}fairyforest_bounding_boxes.csv ${BENCH_OUT_DIR}conference_bounding_boxes.csv ${BENCH_OUT_DIR}sanmiguel_bounding_boxes.csv ${BENCH_OUT_DIR}sibenik_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}fairyforest_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}conference_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}sanmiguel_bounding_boxes_shared_memory.csv --series-labels withoutSharedMemory withSharedMemory --out=${PLOTS_OUT_DIR}shared_memory_comparison.pdf
+python3 ./plotter/plot.py series ${BENCH_OUT_DIR}sibenik_bounding_boxes.csv ${BENCH_OUT_DIR}fairyforest_bounding_boxes.csv ${BENCH_OUT_DIR}conference_bounding_boxes.csv ${BENCH_OUT_DIR}sanmiguel_bounding_boxes.csv ${BENCH_OUT_DIR}sibenik_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}fairyforest_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}conference_bounding_boxes_shared_memory.csv ${BENCH_OUT_DIR}sanmiguel_bounding_boxes_shared_memory.csv --series-labels withoutSharedMemory withSharedMemory --skip-first-n-iterations=${WARMUPS} --out=${PLOTS_OUT_DIR}shared_memory_comparison.pdf
 

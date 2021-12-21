@@ -27,7 +27,7 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
     barplot_data = {}
     assert len(data) % len(series_labels) == 0
     files_per_series = int(len(data) / len(series_labels))
-    scene_names = np.array([df['name'][0].split('/')[1] for df in data_frames[:files_per_series]])
+    scene_names = np.array([df['name'].to_numpy()[0].split('/')[1] for df in data_frames[:files_per_series]])
     for i, label in enumerate(series_labels):
         barplot_data[label] = data[i*files_per_series:(i+1)*files_per_series]
    
