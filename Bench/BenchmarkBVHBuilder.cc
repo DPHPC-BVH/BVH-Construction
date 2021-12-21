@@ -119,8 +119,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilderAlgorithmOnly(benchmark::
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -130,27 +129,23 @@ template <int SceneIndex> static void BM_CudaBVHBuilderAlgorithmOnly(benchmark::
         timer.Start();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+        builder->GenerateMortonCodesHelper();
 
         // 2. Sort Morton Codes
-        unsigned int* dMortonCodesSorted;
-	    unsigned int* dMortonIndicesSorted;
-	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper();
 
         // 3. Build tree hierarchy of CudaBVHBuildNodes
-        CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
+       builder->BuildTreeHierarchyHelper();
 
         // 4. Compute Bounding Boxes of each node
-        builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+        builder->ComputeBoundingBoxesHelper();
 
         // End Timers
         double elapsed_microseconds = timer.Stop();
         state.PauseTiming();
         
         // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
-        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, dTree, nPrimitives);
+        builder->PermutePrimitivesAndFlattenTree();
         
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
@@ -199,8 +194,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benc
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -210,9 +204,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benc
         timer.Start();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-	    builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+	    builder->GenerateMortonCodesHelper();
         
         // End Timers
         double elapsed_microseconds = timer.Stop();
@@ -221,9 +213,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_GenerateMortonCodes(benc
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
-        cudaFree(dMortonCodes);
-        cudaFree(dMortonIndices);
-        cudaFree(dPrimitiveInfo);
         delete builder;
 
         state.ResumeTiming();
@@ -266,13 +255,10 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+        builder->GenerateMortonCodesHelper();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -282,9 +268,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
         timer.Start();
         
         // 2. Sort Morton Codes
-        unsigned int* dMortonCodesSorted;
-	    unsigned int* dMortonIndicesSorted;
-	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper();
         
         // End Timers
         double elapsed_microseconds = timer.Stop();
@@ -293,9 +277,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_SortMortonCodes(benchmar
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
-        cudaFree(dMortonCodesSorted);
-        cudaFree(dMortonIndicesSorted);
-        cudaFree(dPrimitiveInfo);
         delete builder;
 
         state.ResumeTiming();
@@ -338,18 +319,13 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+        builder->GenerateMortonCodesHelper();
 
         // 2. Sort Morton Codes
-        unsigned int* dMortonCodesSorted;
-	    unsigned int* dMortonIndicesSorted;
-	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -359,7 +335,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
         timer.Start();
         
         // 3. Build tree hierarchy of CudaBVHBuildNodes
-        CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
+        builder->BuildTreeHierarchyHelper();
        
         // End Timers
         double elapsed_microseconds = timer.Stop();
@@ -368,8 +344,6 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_BuildTreeHierarchy(bench
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
-        cudaFree(dTree);
-        cudaFree(dPrimitiveInfo);
         delete builder;
 
         state.ResumeTiming();
@@ -413,21 +387,16 @@ template <int SceneIndex, bool UseSharedMemory> static void BM_CudaBVHBuilder_Co
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh, UseSharedMemory);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+        builder->GenerateMortonCodesHelper();
 
         // 2. Sort Morton Codes
-        unsigned int* dMortonCodesSorted;
-	    unsigned int* dMortonIndicesSorted;
-	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper();
 
         // 3. Build tree hierarchy of CudaBVHBuildNodes
-        CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
+        builder->BuildTreeHierarchyHelper();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -437,7 +406,7 @@ template <int SceneIndex, bool UseSharedMemory> static void BM_CudaBVHBuilder_Co
         timer.Start();
         
         // 4. Compute Bounding Boxes of each node
-	    builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+	    builder->ComputeBoundingBoxesHelper();
 
         // End Timers
         double elapsed_microseconds = timer.Stop();
@@ -446,7 +415,6 @@ template <int SceneIndex, bool UseSharedMemory> static void BM_CudaBVHBuilder_Co
         state.SetIterationTime(elapsed_microseconds / 1e6);
 
         // Clean Up
-        cudaFree(dTree);
         delete builder;
 
         state.ResumeTiming();
@@ -495,24 +463,19 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         scene->bvh = BVH(pTriangles);
         CudaBVHBuilder* builder = new CudaBVHBuilder(scene->bvh);
 
-        const unsigned int nPrimitives = builder->primitiveInfo.size();
-	    BVHPrimitiveInfoWithIndex* dPrimitiveInfo = builder->PrepareDevicePrimitiveInfo(nPrimitives);
+        builder->AllocAuxBuffers();
         
         // 1. Compute Morton Codes
-        unsigned int* dMortonCodes;
-	    unsigned int* dMortonIndices;
-        builder->GenerateMortonCodesHelper(dPrimitiveInfo, &dMortonCodes, &dMortonIndices, nPrimitives);
+        builder->GenerateMortonCodesHelper();
 
         // 2. Sort Morton Codes
-        unsigned int* dMortonCodesSorted;
-	    unsigned int* dMortonIndicesSorted;
-	    builder->SortMortonCodesHelper(dPrimitiveInfo, dMortonCodes, dMortonIndices, &dMortonCodesSorted, &dMortonIndicesSorted, nPrimitives);
+	    builder->SortMortonCodesHelper();
 
         // 3. Build tree hierarchy of CudaBVHBuildNodes
-        CudaBVHBuildNode* dTree = builder->BuildTreeHierarchyHelper(dMortonCodesSorted, dMortonIndicesSorted, nPrimitives);
+        builder->BuildTreeHierarchyHelper();
 
         // 4. Compute Bounding Boxes of each node
-        builder->ComputeBoundingBoxesHelper(dPrimitiveInfo, dTree, nPrimitives);
+        builder->ComputeBoundingBoxesHelper();
 
         // Additional GPU Timer
         TimerGPU timer;
@@ -522,7 +485,7 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
         timer.Start();
         
         // 5. Flatten Tree and order BVH::primitives according to dMortonIndicesSorted
-        builder->PermutePrimitivesAndFlattenTree(dMortonIndicesSorted, dTree, nPrimitives);
+        builder->PermutePrimitivesAndFlattenTree();
        
         // End Timers
         double elapsed_microseconds = timer.Stop();
