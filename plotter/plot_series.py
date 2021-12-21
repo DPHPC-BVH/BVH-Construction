@@ -35,7 +35,7 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
         baseline_data_dict = read_in_baseline(baseline)
         barplot_data['Baseline'] = []
         for name in scene_names:
-            barplot_data['Baseline'].append(np.median(baseline_data_dict[name]) if strategy == 'median' else np.mean(baseline_data_dict[name]))
+            barplot_data['Baseline'].append(np.median(baseline_data_dict[name][skip_first_n_iterations:]) if strategy == 'median' else np.mean(baseline_data_dict[name][skip_first_n_iterations:]))
     
     # compute label locations and bar offsets
     x = np.arange(len(scene_names))
@@ -50,7 +50,7 @@ def plot_series(files, series_labels, baseline, strategy, skip_first_n_iteration
 
     ax.set_ylabel('Execution time (ns)')
     ax.set_xlabel('Scene')
-    ax.set_title('Execution time for diffrent scenes')
+    ax.set_title('Execution time for different scenes')
     plt.xticks(x, scene_names)
 
     plt.legend(bbox_to_anchor=(1.01,0.5), loc="center left")
