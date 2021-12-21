@@ -58,10 +58,10 @@ int main(int argc, char** argv) {
 	};
 
 	Renderer::RenderOption options[4] = {
-		{Point2i(1600, 900), 64, 15.0f},
-		{Point2i(1600, 900), 32, 3.0f},
-		{Point2i(1600, 900), 32, 10.0f},
-		{Point2i(1600, 900), 32, 1.5f}
+		{Point2i(800, 600), 32, 15.0f},
+		{Point2i(800, 600), 32, 3.0f},
+		{Point2i(800, 600), 32, 10.0f},
+		{Point2i(800, 600), 32, 1.5f}
 	};
 
 	std::string CameraSignatures[4] = {
