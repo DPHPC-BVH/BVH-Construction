@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 
-from util import shapiro_wilk_test, read_csv
+from util import shapiro_wilk_test, read_csv, mean_confidence_interval, median_confidence_interval_95
 
 
 def add_plot_distribution_subparser(parser):
@@ -78,24 +78,20 @@ def plot_distribution(file, without_labels, without_additional_info, unit, skip_
     draw_vertical_line(qunatile, exponent, label='Quantile 95%', linestyle=(0, (3, 2, 1, 2, 1, 2)), color='red', without_labels=without_labels)
 
     # Calculate confidence interval (mean)
-    _, lower, upper = mean_confidence_interval(time)
+    _, lower_ci_mean, upper_ci_mean = mean_confidence_interval(time)
+
+    # Calculate confidence interval (medain)
+    _, lower_ci_median, upper_ci_median = median_confidence_interval_95(time)
 
     # Additional Info
     if not without_additional_info:
         plt.gcf().text(0.5, 0.075, 'Mean: {:.2f}, Median: {:.2f}, Min: {:.2f}, Max: {:.2f}, Quantile 95%: {:.2f}'.format(mean / exponent, median / exponent, min / exponent, max / exponent, qunatile / exponent), horizontalalignment='center', verticalalignment='center')
-        plt.gcf().text(0.5, 0.025, 'CI 95% (Mean): ({:.2f},{:.2f})'.format(lower / exponent, upper / exponent), horizontalalignment='center', verticalalignment='center')
+        plt.gcf().text(0.5, 0.040, 'CI 95% (Mean): ({:.2f},{:.2f})'.format(lower_ci_mean / exponent, upper_ci_mean / exponent), horizontalalignment='center', verticalalignment='center')
+        plt.gcf().text(0.5, 0.005, 'CI 95% (Median): ({:.2f},{:.2f})'.format(lower_ci_median / exponent, upper_ci_median / exponent), horizontalalignment='center', verticalalignment='center')
         plt.subplots_adjust(bottom=0.2)    
 
     # Save Plot
     plt.savefig(out, bbox_inches="tight")
-
-
-def mean_confidence_interval(data, confidence=0.95):
-    a = 1.0 * np.array(data)
-    n = len(a)
-    m, se = np.mean(a), stats.sem(a)
-    lower, upper = stats.t.interval(0.95, n-1, loc=m, scale=se)
-    return m, lower, upper
 
 
 def transform_to_fit(data):
