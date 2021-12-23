@@ -10,7 +10,7 @@ def add_plot_distribution_subparser(parser):
     subparser.add_argument('file', type=str, help='The path to the csv file containing the measurements')
     subparser.add_argument('--without-labels', action='store_true', help='Hides the labels')
     subparser.add_argument('--without-additional-info', action='store_true', help='Hides additional information under the plot')
-    subparser.add_argument('--unit', choices=['s', 'ms', 'us', 'ns'], default='us', help='The time unit, used for the histogram')
+    subparser.add_argument('--unit', choices=['s', 'ms', 'us', 'ns'], default='ms', help='The time unit, used for the histogram')
     subparser.add_argument('--skip-first-n-iterations', type=int, default=0, help='The number of first iterations to skip (used to skip warm-up iterations)')
     subparser.add_argument('--out', type=str, default='plot.pdf', help='specifies the output file')
 
@@ -42,7 +42,7 @@ def plot_distribution(file, without_labels, without_additional_info, unit, skip_
     
     # Rename ticks
     locs, _ = plt.xticks()
-    labels = [str(x / exponent) for x in locs]
+    labels = ['{:.2f}'.format(x * exponent) for x in locs]
     plt.xticks(locs, labels)
     plt.xlim(time_min - 1, time_max + 1)
     
@@ -85,9 +85,9 @@ def plot_distribution(file, without_labels, without_additional_info, unit, skip_
 
     # Additional Info
     if not without_additional_info:
-        plt.gcf().text(0.5, 0.075, 'Mean: {:.2f}, Median: {:.2f}, Min: {:.2f}, Max: {:.2f}, Quantile 95%: {:.2f}'.format(mean / exponent, median / exponent, min / exponent, max / exponent, qunatile / exponent), horizontalalignment='center', verticalalignment='center')
-        plt.gcf().text(0.5, 0.040, 'CI 95% (Mean): ({:.2f},{:.2f})'.format(lower_ci_mean / exponent, upper_ci_mean / exponent), horizontalalignment='center', verticalalignment='center')
-        plt.gcf().text(0.5, 0.005, 'CI 95% (Median): ({:.2f},{:.2f})'.format(lower_ci_median / exponent, upper_ci_median / exponent), horizontalalignment='center', verticalalignment='center')
+        plt.gcf().text(0.5, 0.075, 'Mean: {:.2f}, Median: {:.2f}, Min: {:.2f}, Max: {:.2f}, Quantile 95%: {:.2f}'.format(mean * exponent, median * exponent, min * exponent, max * exponent, qunatile * exponent), horizontalalignment='center', verticalalignment='center')
+        plt.gcf().text(0.5, 0.040, 'CI 95% (Mean): ({:.2f},{:.2f})'.format(lower_ci_mean * exponent, upper_ci_mean * exponent), horizontalalignment='center', verticalalignment='center')
+        plt.gcf().text(0.5, 0.005, 'CI 95% (Median): ({:.2f},{:.2f})'.format(lower_ci_median * exponent, upper_ci_median * exponent), horizontalalignment='center', verticalalignment='center')
         plt.subplots_adjust(bottom=0.2)    
 
     # Save Plot
@@ -105,7 +105,6 @@ def transform_to_fit(data):
 
     if n_bins < 10:
         exponent = 10**(np.floor(np.log10(np.max(data) - np.min(data))) - 1)
-        print(exponent)
         data /= exponent
 
     return data, exponent
@@ -115,7 +114,7 @@ def draw_vertical_line(value, exponent, label, linestyle, color, without_labels=
     _, max_ylim = plt.ylim()
     if not without_labels:
         plt.text(value, max_ylim * 1.02, label, fontsize='small', horizontalalignment='center', verticalalignment='center', color=color)
-        plt.text(value + 0.15, max_ylim*0.85, '{:.2f}'.format(value / exponent), rotation=90, fontsize='small')
+        plt.text(value + 0.15, max_ylim*0.85, '{:.2f}'.format(value * exponent), rotation=90, fontsize='small')
 
 def convert_ns_to_format(time, unit):
     if unit == 'ns':
