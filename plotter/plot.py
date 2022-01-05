@@ -3,6 +3,7 @@ from plot_distribution import plot_distribution, add_plot_distribution_subparser
 from plot_stages import plot_stages, add_plot_stages_subparser
 from plot_series import plot_series, add_plot_series_subparser
 from plot_qq import plot_qq, add_plot_qq_subparser
+from plot_boxplot import plot_boxplot, add_plot_boxplot_subparser
 
 def main():
 
@@ -14,6 +15,7 @@ def main():
     add_plot_stages_subparser(subparsers)
     add_plot_series_subparser(subparsers)
     add_plot_qq_subparser(subparsers)
+    add_plot_boxplot_subparser(subparsers)
     
     args = vars(parser.parse_args())
     plot(**args)
@@ -27,6 +29,8 @@ def plot(plot, **kwargs):
         plot_series(**kwargs)
     elif plot == 'qqplot':
         plot_qq(**kwargs)
+    elif plot == 'boxplot':
+        plot_boxplot(**kwargs)
     else:
         raise Exception("Invalid plot type")
 
