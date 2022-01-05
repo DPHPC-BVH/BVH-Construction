@@ -513,78 +513,87 @@ template <int SceneIndex> static void BM_CudaBVHBuilder_PermutePrimitivesAndFlat
 //BENCHMARK_TEMPLATE(BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree, 3)->Name("BM_CudaBVHBuilder_PermutePrimitivesAndFlattenTree/" + SceneNames[3])->Iterations(1)->ReportAggregatesOnly(false)->UseManualTime();
 
 #define IMPLEMENT_SCALABILITY_TEST(SceneIndex, func) \
-    BENCHMARK_TEMPLATE(func, 0, 1)->Name(#func + SceneNames[SceneIndex] + "/1")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 2)->Name(#func + SceneNames[SceneIndex] + "/2")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 3)->Name(#func + SceneNames[SceneIndex] + "/3")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 4)->Name(#func + SceneNames[SceneIndex] + "/4")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 5)->Name(#func + SceneNames[SceneIndex] + "/5")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 6)->Name(#func + SceneNames[SceneIndex] + "/6")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 7)->Name(#func + SceneNames[SceneIndex] + "/7")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 8)->Name(#func + SceneNames[SceneIndex] + "/8")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 9)->Name(#func + SceneNames[SceneIndex] + "/9")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 10)->Name(#func + SceneNames[SceneIndex] + "/10")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 11)->Name(#func + SceneNames[SceneIndex] + "/11")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 12)->Name(#func + SceneNames[SceneIndex] + "/12")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 13)->Name(#func + SceneNames[SceneIndex] + "/13")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 14)->Name(#func + SceneNames[SceneIndex] + "/14")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 15)->Name(#func + SceneNames[SceneIndex] + "/15")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 16)->Name(#func + SceneNames[SceneIndex] + "/16")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 17)->Name(#func + SceneNames[SceneIndex] + "/17")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 18)->Name(#func + SceneNames[SceneIndex] + "/18")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 19)->Name(#func + SceneNames[SceneIndex] + "/19")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 20)->Name(#func + SceneNames[SceneIndex] + "/20")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 21)->Name(#func + SceneNames[SceneIndex] + "/21")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 22)->Name(#func + SceneNames[SceneIndex] + "/22")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 23)->Name(#func + SceneNames[SceneIndex] + "/23")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 24)->Name(#func + SceneNames[SceneIndex] + "/24")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 25)->Name(#func + SceneNames[SceneIndex] + "/25")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 26)->Name(#func + SceneNames[SceneIndex] + "/26")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 27)->Name(#func + SceneNames[SceneIndex] + "/27")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 28)->Name(#func + SceneNames[SceneIndex] + "/28")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 29)->Name(#func + SceneNames[SceneIndex] + "/29")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 30)->Name(#func + SceneNames[SceneIndex] + "/30")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 32)->Name(#func + SceneNames[SceneIndex] + "/32")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 34)->Name(#func + SceneNames[SceneIndex] + "/34")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 36)->Name(#func + SceneNames[SceneIndex] + "/36")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 38)->Name(#func + SceneNames[SceneIndex] + "/38")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 40)->Name(#func + SceneNames[SceneIndex] + "/40")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 45)->Name(#func + SceneNames[SceneIndex] + "/45")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 50)->Name(#func + SceneNames[SceneIndex] + "/50")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 60)->Name(#func + SceneNames[SceneIndex] + "/60")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 70)->Name(#func + SceneNames[SceneIndex] + "/70")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 80)->Name(#func + SceneNames[SceneIndex] + "/80")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 90)->Name(#func + SceneNames[SceneIndex] + "/90")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 100)->Name(#func + SceneNames[SceneIndex] + "/100")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 125)->Name(#func + SceneNames[SceneIndex] + "/125")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 150)->Name(#func + SceneNames[SceneIndex] + "/150")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 175)->Name(#func + SceneNames[SceneIndex] + "/175")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 200)->Name(#func + SceneNames[SceneIndex] + "/200")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 250)->Name(#func + SceneNames[SceneIndex] + "/250")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 300)->Name(#func + SceneNames[SceneIndex] + "/300")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 350)->Name(#func + SceneNames[SceneIndex] + "/350")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, 400)->Name(#func + SceneNames[SceneIndex] + "/400")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
-	BENCHMARK_TEMPLATE(func, 0, -1)->Name(#func + SceneNames[SceneIndex] + "/-1")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 1)->Name(#func + SceneNames[SceneIndex] + "/1")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 2)->Name(#func + SceneNames[SceneIndex] + "/2")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 3)->Name(#func + SceneNames[SceneIndex] + "/3")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 4)->Name(#func + SceneNames[SceneIndex] + "/4")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 5)->Name(#func + SceneNames[SceneIndex] + "/5")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 6)->Name(#func + SceneNames[SceneIndex] + "/6")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 7)->Name(#func + SceneNames[SceneIndex] + "/7")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 8)->Name(#func + SceneNames[SceneIndex] + "/8")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 9)->Name(#func + SceneNames[SceneIndex] + "/9")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 10)->Name(#func + SceneNames[SceneIndex] + "/10")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 11)->Name(#func + SceneNames[SceneIndex] + "/11")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 12)->Name(#func + SceneNames[SceneIndex] + "/12")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 13)->Name(#func + SceneNames[SceneIndex] + "/13")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 14)->Name(#func + SceneNames[SceneIndex] + "/14")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 15)->Name(#func + SceneNames[SceneIndex] + "/15")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 16)->Name(#func + SceneNames[SceneIndex] + "/16")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 17)->Name(#func + SceneNames[SceneIndex] + "/17")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 18)->Name(#func + SceneNames[SceneIndex] + "/18")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 19)->Name(#func + SceneNames[SceneIndex] + "/19")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 20)->Name(#func + SceneNames[SceneIndex] + "/20")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 21)->Name(#func + SceneNames[SceneIndex] + "/21")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 22)->Name(#func + SceneNames[SceneIndex] + "/22")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 23)->Name(#func + SceneNames[SceneIndex] + "/23")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 24)->Name(#func + SceneNames[SceneIndex] + "/24")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 25)->Name(#func + SceneNames[SceneIndex] + "/25")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 26)->Name(#func + SceneNames[SceneIndex] + "/26")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 27)->Name(#func + SceneNames[SceneIndex] + "/27")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 28)->Name(#func + SceneNames[SceneIndex] + "/28")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 29)->Name(#func + SceneNames[SceneIndex] + "/29")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 30)->Name(#func + SceneNames[SceneIndex] + "/30")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 32)->Name(#func + SceneNames[SceneIndex] + "/32")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 34)->Name(#func + SceneNames[SceneIndex] + "/34")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 36)->Name(#func + SceneNames[SceneIndex] + "/36")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 38)->Name(#func + SceneNames[SceneIndex] + "/38")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 40)->Name(#func + SceneNames[SceneIndex] + "/40")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 45)->Name(#func + SceneNames[SceneIndex] + "/45")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 50)->Name(#func + SceneNames[SceneIndex] + "/50")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 60)->Name(#func + SceneNames[SceneIndex] + "/60")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 70)->Name(#func + SceneNames[SceneIndex] + "/70")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 80)->Name(#func + SceneNames[SceneIndex] + "/80")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 90)->Name(#func + SceneNames[SceneIndex] + "/90")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 100)->Name(#func + SceneNames[SceneIndex] + "/100")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 110)->Name(#func + SceneNames[SceneIndex] + "/110")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 120)->Name(#func + SceneNames[SceneIndex] + "/120")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 130)->Name(#func + SceneNames[SceneIndex] + "/130")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 140)->Name(#func + SceneNames[SceneIndex] + "/140")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 150)->Name(#func + SceneNames[SceneIndex] + "/150")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 160)->Name(#func + SceneNames[SceneIndex] + "/160")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 170)->Name(#func + SceneNames[SceneIndex] + "/170")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 180)->Name(#func + SceneNames[SceneIndex] + "/180")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 190)->Name(#func + SceneNames[SceneIndex] + "/190")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 200)->Name(#func + SceneNames[SceneIndex] + "/200")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 225)->Name(#func + SceneNames[SceneIndex] + "/225")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 250)->Name(#func + SceneNames[SceneIndex] + "/250")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 275)->Name(#func + SceneNames[SceneIndex] + "/275")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 300)->Name(#func + SceneNames[SceneIndex] + "/300")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 325)->Name(#func + SceneNames[SceneIndex] + "/325")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 350)->Name(#func + SceneNames[SceneIndex] + "/350")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 375)->Name(#func + SceneNames[SceneIndex] + "/375")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, 400)->Name(#func + SceneNames[SceneIndex] + "/400")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
+		BENCHMARK_TEMPLATE(func, SceneIndex, -1)->Name(#func + SceneNames[SceneIndex] + "/-1")->Iterations(1)->ReportAggregatesOnly(true)->UseManualTime(); \
 
-
-IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_GenerateMortonCodes)
-IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_BuildTreeHierarchy)
-IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_ComputeBoundingBoxes)
-IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilderAlgorithmOnly)
-
-IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_GenerateMortonCodes)
-IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_BuildTreeHierarchy)
-IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_ComputeBoundingBoxes)
-IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilderAlgorithmOnly)
-
-IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_GenerateMortonCodes)
-IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_BuildTreeHierarchy)
+//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_GenerateMortonCodes)
+//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_BuildTreeHierarchy)
+//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+//IMPLEMENT_SCALABILITY_TEST(0, BM_CudaBVHBuilderAlgorithmOnly)
+//
+//IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_GenerateMortonCodes)
+//IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_BuildTreeHierarchy)
+//IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+//IMPLEMENT_SCALABILITY_TEST(1, BM_CudaBVHBuilderAlgorithmOnly)
+//
+//IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_GenerateMortonCodes)
+//IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_BuildTreeHierarchy)
 IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilder_ComputeBoundingBoxes)
 IMPLEMENT_SCALABILITY_TEST(2, BM_CudaBVHBuilderAlgorithmOnly)
 
-IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_GenerateMortonCodes)
-IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_BuildTreeHierarchy)
-IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_ComputeBoundingBoxes)
-IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilderAlgorithmOnly)
+//IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_GenerateMortonCodes)
+//IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_BuildTreeHierarchy)
+//IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilder_ComputeBoundingBoxes)
+//IMPLEMENT_SCALABILITY_TEST(3, BM_CudaBVHBuilderAlgorithmOnly)
 BENCHMARK_MAIN();
 
 NAMESPACE_DPHPC_END
