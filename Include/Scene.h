@@ -4,16 +4,23 @@
 #include "Geometry.h"
 #include "Triangle.h"
 #include "BVH.h"
+#include "BVHBuilder.h"
+
+ // Nasty hack such that we can benchmark private functions
+#define private public
 
 
 NAMESPACE_DPHPC_BEGIN
 class Scene {
 	friend class Renderer;
 public:
-	void LoadMesh(std::string path);
+	void LoadMesh(std::string path, BVHBuilderType type);
 	Scene();
 
 private:
+	void LoadMeshFromFile(std::string path);
+	void BuildBVH(BVHBuilderType type);
+	
 	int numTriangles;
 	int numVertices;
 
@@ -26,6 +33,10 @@ private:
 };
 
 
+
 NAMESPACE_DPHPC_END
+
+// Nasty hack such that we can benchmark private functions
+#undef private
 
 

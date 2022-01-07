@@ -47,6 +47,25 @@ void ComputeBoundingBoxes(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveI
 
 __global__ void ComputeBoundingBoxesKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
 
+void ComputeBoundingBoxesWithSharedMemory(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo);
+
+void ComputeBoundingBoxesWithSharedMemoryWrapper(int nPrimitives, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo,
+        dim3 gridSize, dim3 blockSize, size_t sharedMemorySize);
+
+/**
+ * Computes bounding boxes in Tree hierarchy on GPU with shared memory
+ */
+template <int blockSizeX> void ComputeBoundingBoxesWithSharedMemory(int nPrimitives, CudaBVHBuildNode* dTree, BVHPrimitiveInfoWithIndex* dPrimitiveInfo) {
+
+    dim3 blockSize(blockSizeX, 1, 1);
+    dim3 gridSize((nPrimitives + (blockSize.x - 1)) / blockSize.x, 1, 1);
+    size_t sharedMemorySize = blockSize.x * sizeof(Bounds3f);
+
+    ComputeBoundingBoxesWithSharedMemoryWrapper(nPrimitives, dTree, dPrimitiveInfo, gridSize, blockSize, sharedMemorySize);
+   
+}
+__global__ void ComputeBoundingBoxesWithSharedMemoryKernel(int nPrimitives, CudaBVHBuildNode* tree, BVHPrimitiveInfoWithIndex* primitiveInfo, int* interiorNodeCounter);
+
 __device__ void BoundingBoxUnion(Bounds3f bIn1, Bounds3f bIn2, Bounds3f* bOut);
 
 

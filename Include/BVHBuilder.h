@@ -36,10 +36,17 @@ struct BVHBuildNode {
 	int splitAxis, firstPrimOffset, nPrimitives;
 };
 
-
+enum class BVHBuilderType
+{
+    RecursiveBVHBuilder,
+    LBVHBuilder,
+    CudaBVHBuilder,
+	CudaBVHBuilderWithSharedMemory
+};
 
 class BVHBuilder {
 public:
+	static BVHBuilder* MakeBVHBuilder(BVHBuilderType type, BVH* bvh);
 	BVHBuilder(BVH& bvh);
 	virtual void BuildBVH() = 0;
 

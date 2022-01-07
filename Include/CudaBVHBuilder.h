@@ -4,6 +4,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+// Nasty hack such that we can benchmark private functions
+#define private public
 
 NAMESPACE_DPHPC_BEGIN
 
@@ -44,17 +46,79 @@ struct CudaBVHBuildNode {
 
 class CudaBVHBuilder : public BVHBuilder {
 public:
-	CudaBVHBuilder(BVH& bvh);
+	CudaBVHBuilder(BVH& bvh, bool sharedMemoryUsed = false);
 	~CudaBVHBuilder();
 
 	// Inherited via BVHBuilder
 	virtual void BuildBVH() override;
 
 private:
+	// If true, shared memory is used to compute bounding boxes
+	bool sharedMemoryUsed;
+
 	std::vector<BVHPrimitiveInfoWithIndex> primitiveInfo;
+	int nPrimitives = 0;
+
 	int FlattenBVHTree(CudaBVHBuildNode nodes[], int nodeIndex, int* offset, int totalPrimitives);
+
+
+
+
+	void GenerateMortonCodesHelper();
+
+	void SortMortonCodesHelper();
+	
+	void  BuildTreeHierarchyHelper();
+
+	void ComputeBoundingBoxesHelper();
+
+	void PermutePrimitivesAndFlattenTree();
+
+	// Buffers used during construction. Freed after construction.
+	BVHPrimitiveInfoWithIndex* dPrimitiveInfo = nullptr;
+	unsigned int* dMortonCodes = nullptr;
+	unsigned int* dMortonIndices = nullptr;
+	unsigned int* dMortonCodesSorted = nullptr;
+	unsigned int* dMortonIndicesSorted = nullptr;
+	CudaBVHBuildNode* dTree = nullptr;
+
+
+
+	void AllocAuxBuffers() {
+		// For BVH construction we only need the bounding boxes and the centroids of the primitive
+		cudaMalloc(&dPrimitiveInfo, sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives);
+		cudaMemcpy(dPrimitiveInfo, primitiveInfo.data(), sizeof(BVHPrimitiveInfoWithIndex) * nPrimitives, cudaMemcpyHostToDevice);
+		
+		cudaMalloc(&dMortonCodes, sizeof(unsigned int) * nPrimitives);
+		cudaMalloc(&dMortonIndices, sizeof(unsigned int) * nPrimitives);
+
+		cudaMalloc(&dMortonCodesSorted, sizeof(unsigned int) * nPrimitives);
+		cudaMalloc(&dMortonIndicesSorted, sizeof(unsigned int) * nPrimitives);
+
+		cudaMalloc(&dTree, sizeof(CudaBVHBuildNode) * (2 * nPrimitives - 1));
+		
+	}
+
+	static void inline safeFree(void* devPtr) {
+		if(devPtr) {
+			cudaFree(devPtr);
+			devPtr = nullptr;
+		} 
+	}
+	void FreeAuxBuffers() {
+		safeFree(dPrimitiveInfo);
+		safeFree(dMortonCodes);
+		safeFree(dMortonIndices);
+		safeFree(dMortonCodesSorted);
+		safeFree(dMortonIndicesSorted);
+		safeFree(dTree);
+	}
+
 
 };
 
 
 NAMESPACE_DPHPC_END
+
+// Nasty hack such that we can benchmark private functions
+#undef private

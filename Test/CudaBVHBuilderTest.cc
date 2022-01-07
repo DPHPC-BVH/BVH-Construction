@@ -30,7 +30,7 @@ TEST(CudaBVHBuilderTest, getMortonCode32) {
 
 TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
 
-  unsigned int nPrimitives = 8;
+  constexpr unsigned int nPrimitives = 8;
   unsigned int mortonCodeSorted[nPrimitives] = {
       0b00000000000000000000000000000001,
       0b00000000000000000000000000000010,
@@ -104,7 +104,7 @@ TEST(CudaBVHBuilderTest, BuildTreeHierarchy) {
 
 TEST(CudaBVHBuilderTest, ComputeBoundingBoxes) {
 
-  unsigned int nPrimitives = 8;
+  constexpr unsigned int nPrimitives = 8;
   unsigned int mortonCodeSorted[nPrimitives] = {
       0b00000000000000000000000000000001,
       0b00000000000000000000000000000010,
@@ -188,4 +188,89 @@ TEST(CudaBVHBuilderTest, ComputeBoundingBoxes) {
 
 }
 
+TEST(CudaBVHBuilderTest, ComputeBoundingBoxesWithSharedMemory) {
+
+  constexpr unsigned int nPrimitives = 8;
+  unsigned int mortonCodeSorted[nPrimitives] = {
+      0b00000000000000000000000000000001,
+      0b00000000000000000000000000000010,
+      0b00000000000000000000000000000100,
+      0b00000000000000000000000000000101,
+      0b00000000000000000000000000010011,
+      0b00000000000000000000000000011000,
+      0b00000000000000000000000000011001,
+      0b00000000000000000000000000011110,
+  };
+
+  unsigned int indicesSorted[nPrimitives] = {6, 3, 7, 1, 0, 5, 2, 4};
+
+  CudaBVHBuildNode tree[2*nPrimitives - 1] = {
+    // Interior nodes
+    CudaBVHBuildNode(3, 4, -1),
+    CudaBVHBuildNode(7, 8, 3),
+    CudaBVHBuildNode(9, 10, 3),
+    CudaBVHBuildNode(1, 2, 0),
+    CudaBVHBuildNode(11, 5, 0),
+    CudaBVHBuildNode(6, 14, 4),
+    CudaBVHBuildNode(12, 13, 5),
+
+    // Leafs
+    CudaBVHBuildNode(-1, -1, 1, indicesSorted[0]),
+    CudaBVHBuildNode(-1, -1, 1, indicesSorted[1]),
+    CudaBVHBuildNode(-1, -1, 2, indicesSorted[2]),
+    CudaBVHBuildNode(-1, -1, 2, indicesSorted[3]),
+    CudaBVHBuildNode(-1, -1, 4, indicesSorted[4]),
+    CudaBVHBuildNode(-1, -1, 6, indicesSorted[5]),
+    CudaBVHBuildNode(-1, -1, 6, indicesSorted[6]),
+    CudaBVHBuildNode(-1, -1, 5, indicesSorted[7])
+
+  };
+
+  auto randomFloat = []() {return static_cast <Float> (rand()) / static_cast <Float> (RAND_MAX); };
+
+  BVHPrimitiveInfoWithIndex primitiveInfo[nPrimitives] = {
+    BVHPrimitiveInfoWithIndex(indicesSorted[0], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[1], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[2], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[3], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[4], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[5], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[6], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat()))),
+    BVHPrimitiveInfoWithIndex(indicesSorted[7], Bounds3f(Point3f(randomFloat(), randomFloat(), randomFloat()), Point3f(randomFloat(), randomFloat(), randomFloat())))
+  };
+
+  
+  CudaBVHBuildNode* dTree;
+  cudaMalloc(&dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode));
+  cudaMemcpy(dTree, tree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyHostToDevice);
+
+  BVHPrimitiveInfoWithIndex* dPrimitiveInfo;
+  cudaMalloc(&dPrimitiveInfo, nPrimitives * sizeof(BVHPrimitiveInfoWithIndex));
+  cudaMemcpy(dPrimitiveInfo, primitiveInfo, nPrimitives * sizeof(BVHPrimitiveInfoWithIndex), cudaMemcpyHostToDevice);
+
+  ComputeBoundingBoxesWithSharedMemory<2>(nPrimitives, dTree, dPrimitiveInfo);
+
+  CudaBVHBuildNode treeWithBoundingBoxes[2*nPrimitives - 1];
+  cudaMemcpy(treeWithBoundingBoxes, dTree, (2 * nPrimitives - 1) * sizeof(CudaBVHBuildNode), cudaMemcpyDeviceToHost);
+
+  cudaFree(dTree);
+  cudaFree(dPrimitiveInfo);
+  
+
+  for (size_t i = 0; i < 2 * nPrimitives - 1; i++) {
+
+    if(i < nPrimitives - 1) {
+      // Interior node so dataIdx is -1
+      CudaBVHBuildNode leftChild = treeWithBoundingBoxes[treeWithBoundingBoxes[i].children[0]];
+      CudaBVHBuildNode rightChild = treeWithBoundingBoxes[treeWithBoundingBoxes[i].children[1]];
+
+      EXPECT_EQ(treeWithBoundingBoxes[i].bounds, Union(leftChild.bounds, rightChild.bounds));
+    }
+    if(i >= nPrimitives - 1) {
+      // Leaf node is dataIdx should be in [0, nPrimitives)
+      EXPECT_EQ(treeWithBoundingBoxes[i].bounds, primitiveInfo[treeWithBoundingBoxes[i].dataIdx].bounds);
+    }
+  }
+
+}
 NAMESPACE_DPHPC_END

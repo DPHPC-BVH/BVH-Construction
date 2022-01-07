@@ -11,10 +11,11 @@ if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RELEASE")
 endif ()
 
-option(BVH_TEST "BVH_TEST" ON)
+option(BVH_TEST 		    "BVH_TEST" 		ON)
+option(BVH_BENCH       	"BVH_BENCH"   ON)
 
 set(BVH_LIB_NAME dphpcbvh)
-set(BVH_LIB_TYPE SHARED)
+set(BVH_LIB_TYPE STATIC)
 
 # Find CUDA and later include $CUDA_INCLUDE_DIRS
 find_package(CUDA 11.0 REQUIRED)
@@ -26,34 +27,19 @@ include_directories(${PROJECT_SOURCE_DIR}/Include ${CUDA_INCLUDE_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-O3")
-set(CMAKE_C_FLAGS "-O3")
+set(CMAKE_CXX_FLAGS "-O3 -save-temps")
+set(CMAKE_C_FLAGS "-O3 -save-temps")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_CUDA_FLAGS "--keep")
 
 
 add_subdirectory(Src)
 
 if (BVH_TEST)
-	# BEGIN Install googletest
-	include(FetchContent)
-	FetchContent_Declare(
-  	googletest
-  	GIT_REPOSITORY https://github.com/google/googletest.git
-  	GIT_TAG        release-1.11.0
-	)
-
-	FetchContent_GetProperties(googletest)
-
-	if(NOT googletest_POPULATED)
-		FetchContent_Populate(googletest)
-			set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-			set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
-			# add the targets: gtest,gtest_main,gmock,gmock_main
-			add_subdirectory(
-				${googletest_SOURCE_DIR}
-				${googletest_BINARY_DIR}
-			)
-	endif()
-	# END INSTALL 
 	enable_testing()
 	add_subdirectory(Test)
+endif ()
+
+if (BVH_BENCH)
+  add_subdirectory(Bench)
 endif ()
