@@ -4,6 +4,9 @@ import csv
 import math
 from scipy import stats
 
+COLORS = [
+    '#332288', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77', '#CC6677', '#882255', '#AA4499'
+]
 
 def shapiro_wilk_test(data, alpha=0.05, verbose=False):
     stat, p = stats.shapiro(data)
@@ -31,6 +34,24 @@ def mean_confidence_interval(data, confidence=0.95):
     m, se = np.mean(a), stats.sem(a)
     lower, upper = stats.t.interval(confidence, n-1, loc=m, scale=se)
     return m, lower, upper
+
+
+def median_largest_diff_95ci(data_array):
+    diff = 0
+    for data in data_array:
+        median, low, high = median_confidence_interval_95(data, confidence=0.95)
+        diff_low = abs(median-low)/median
+        diff_high = abs(high-median)/median
+        diff = max(diff, diff_low)
+        diff = max(diff, diff_high)
+    return diff
+
+def mean_largest_diff_95ci(data_array):
+    diff = 0
+    for data in data_array:
+        mean, lower, _ = mean_confidence_interval(data, confidence=0.95)
+        diff = max(diff, mean - lower)
+    return diff
 
 def convert_ns_to_format(time, unit):
     if unit == 'ns':
